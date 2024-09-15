@@ -1,11 +1,13 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { AppComponent } from './app/app.component';
-import { routes } from './app/app.routes'; // Importe as rotas definidas
+import { provideHttpClient } from '@angular/common/http'; // Atualize a importação
+import { LoginComponent } from './app/Login/login.component';
+import { routes } from './app/app.routes';
 
-bootstrapApplication(AppComponent, {
+bootstrapApplication(LoginComponent, {
   providers: [
-    provideRouter(routes) // Configura o roteamento
+    provideRouter(routes),
+    provideHttpClient() // Atualize aqui
   ]
 });
 

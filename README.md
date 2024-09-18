@@ -29,7 +29,8 @@ Instalar o MongoDb para reconhecer os comandos (npm install mongodb)
 
 ![image](https://github.com/user-attachments/assets/7a595e33-64c7-47e5-9a40-129a65676628)
 
-Como rodar apenas o arquivo index.js
+**Como rodar apenas o arquivo index.js**
+
 Digite "node index.js" no terminal
 Certifique-se de estar na pasta correta para executar o comando.
 ![image](https://github.com/user-attachments/assets/a53b3746-b5bd-4b91-bf15-6a790c3a4acd)

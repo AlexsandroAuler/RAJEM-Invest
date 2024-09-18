@@ -22,9 +22,11 @@ Senha: Rajem$
 Requisitos para rodar o projeto
 
 Instalar o NodeJs (atualmente rodo o projeto com a versão 22.8.0)
+
 ![image](https://github.com/user-attachments/assets/285c703e-3d1f-4a3e-ac83-b9762edcd3c9)
 
 Instalar o MongoDb para reconhecer os comandos (npm install mongodb)
+
 ![image](https://github.com/user-attachments/assets/7a595e33-64c7-47e5-9a40-129a65676628)
 
 Como rodar apenas o arquivo index.js

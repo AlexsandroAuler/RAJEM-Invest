@@ -1,0 +1,31 @@
+<!-- liberar-acesso.component.html -->
+<div class="liberar-acesso">
+  <h2>Configuração do Primeiro Login</h2>
+  
+  <!-- Formulário para inserção de email -->
+  <form (ngSubmit)="gotoGerarToken()">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input
+        id="email"
+        [(ngModel)]="email"
+        name="email"
+        type="email"
+        placeholder="Digite seu email"
+        required
+      />
+    </div>
+
+    <!-- Exibindo o token se disponível -->
+    <div class="token-display" *ngIf="token">
+      <p>Email : {{ email }}</p>
+      <p>Token: {{ token }}</p>
+      <button (click)="copyToken()">Copiar Token</button>
+    </div>
+    
+    <!-- Botão para gerar o token -->
+    <button type="submit">Gerar Token</button>
+  </form>
+</div>
+
+  

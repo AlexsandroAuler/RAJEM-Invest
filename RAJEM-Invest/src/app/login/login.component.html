@@ -10,6 +10,7 @@
         <input type="password" id="password" formControlName="password" required />
       </div>
       <button type="submit" [disabled]="loginForm.invalid">Login</button>
+      <button type="submit" [disabled]="loginForm.invalid">Gerar Token</button>
       <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
     </form>
   </div>

@@ -39,4 +39,22 @@ export class LoginComponent {
       });
     }
   }
+
+  getToken() {
+    if (this.loginForm.valid) {
+      const { email } = this.loginForm.value;
+      this.authService.createToken(email).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.errorMessage = response.message || 'Login failed. Please try again.';
+          }
+        },
+        error: () => {
+          this.errorMessage = 'An error occurred. Please try again.';
+        }
+      });
+    }
+  }
 }

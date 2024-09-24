@@ -6,8 +6,9 @@ function generateUniqueToken(email) {
     token = crypto.createHmac('sha256', secret).update(email).digest('hex');
 
     console.log('Token gerado:', token);
-
     saveTokenToDatabase(email, token);
+
+    return token;
 }
 
 //"npm install mongodb" pra funcionar neh

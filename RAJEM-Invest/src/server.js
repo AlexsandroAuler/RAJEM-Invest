@@ -28,7 +28,7 @@ function handlePostRequest(req, res) {
         
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ message: `Email recebido: ${email}` }));
+        res.end(JSON.stringify({ message: `${token}` }));
       }else {
         throw new Error('Corpo da requisição vazio');
       }

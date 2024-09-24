@@ -1,31 +1,28 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IndexLoginComponent } from './index-login/index-login.component';
 
 @Component({
   selector: 'app-login',
+  standalone: true,  // Habilitando standalone
+  imports: [CommonModule, IndexLoginComponent], // Importando IndexLoginComponent
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
-  standalone: true,
-  imports: [ReactiveFormsModule, CommonModule] // Importando o ReactiveFormsModule aqui
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  loginForm: FormGroup;
-  errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
-    this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
-    });
+  constructor(private router: Router) { }
+
+  // Função para navegar até "primeiro-login"
+  ValidarToken() {
+    this.router.navigate(['/primeiro-login']);
   }
 
-  onSubmit() {
+  getToken() {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.value;
-      this.authService.login(username, password).subscribe({
+      const { email } = this.loginForm.value;
+      this.authService.createToken(email).subscribe({
         next: (response) => {
           if (response.success) {
             this.router.navigate(['/dashboard']);

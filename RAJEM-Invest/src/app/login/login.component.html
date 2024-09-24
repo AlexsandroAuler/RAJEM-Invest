@@ -1,27 +1,5 @@
-<div class="login-container">
-    <div class="login-dados">
-      <form (ngSubmit)="onSubmit()" [formGroup]="loginForm">
-        <div class="input-container">
-          <label for="username">Digite seu email</label>
-          <input type="text" id="username" formControlName="username" required />
-        </div>
-        <div class="input-container">
-          <label for="password">Digite sua senha</label>
-          <input type="password" id="password" formControlName="password" required />
-        </div>
-        <button type="submit" [disabled]="loginForm.invalid">Login</button>
-        <div class="link-container">
-          <a href="link" class="link-recovery">Fazer login pela primeira vez</a>
-        </div>
-        <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
-        
-      </form>
-    </div>
-    <div>
-      <div class="titulo">
-        <h2>RAJEM<br>INVEST</h2>
-      </div>  
-    </div>
-  </div>
 
+<div class="index-login">
+  <app-index-login></app-index-login>
+</div>
 

@@ -3,7 +3,11 @@ const crypto = require('crypto');
 
 function generateUniqueToken(email) {
     const secret = 'RajemSecretKey';
-    return crypto.createHmac('sha256', secret).update(email).digest('hex');
+    token = crypto.createHmac('sha256', secret).update(email).digest('hex');
+
+    console.log('Token gerado:', token);
+
+    saveTokenToDatabase(email, token);
 }
 
 //"npm install mongodb" pra funcionar neh
@@ -45,9 +49,11 @@ async function saveTokenToDatabase(email, token) {
     }
 }
 
-const email = 'user@teste.com';
-const token = generateUniqueToken(email);
+// const email = 'user@teste.com';
+// const token = generateUniqueToken(email);
 
-console.log('Token gerado:', token);
+//console.log('Token gerado:', token);
 
-saveTokenToDatabase(email, token);
+// saveTokenToDatabase(email, token);
+
+module.exports = { generateUniqueToken };

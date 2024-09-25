@@ -12,7 +12,7 @@ export class AuthService {
   email : any;
 
   constructor(private http: HttpClient) { }
-
+  
   login(username: string, password: string): Observable<any> {
     return this.http.post('/login', { username, password });
   }
@@ -24,10 +24,23 @@ export class AuthService {
 
   // Método para enviar o email e receber o token - TESTE
   gerarToken(email: string): Observable<string> {
-    return of('rodrigo10');
-  
-    //Método para enviar o email e receber o token 
-    //return this.http.post<string>(`${this.apiUrl}/gerar-token`, { email });
+  debugger;
+    //Método para enviar o email e receber o token
+    // fetch('http://localhost:3000/createToken', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify({
+    //     email: 'alex@teste.com'
+    //   })
+    // })
+    //   .then(response => response.json())
+    //   .then(data => console.log('Success:', data))
+    //   .catch(error => console.error('Error:', error));
+
+
+    return this.http.post<string>(`http://localhost:3000/createToken`, { email });
   }
 
   validarToken(email: string, token: string): Observable<boolean> {

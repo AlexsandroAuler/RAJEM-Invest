@@ -1,5 +1,11 @@
 const http = require('http');
 const { generateUniqueToken } = require('./index');
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+app.use(cors()); // Habilita o CORS para todas as rotas e origens
+app.use(express.json()); // Para lidar com JSON no corpo das requisições
 
 const hostname = '127.0.0.1';
 const port = 3000;

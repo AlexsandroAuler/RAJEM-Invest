@@ -1,0 +1,40 @@
+<!-- primeiro-login.component.html -->
+<div class="container">
+  <h2>Validação do Token</h2>
+  
+  <!-- Formulário para inserção de email e token -->
+  <form (ngSubmit)="validarToken()">
+    <div class="form-group">
+      <label for="email">Email:</label>
+      <input
+        id="email"
+        [(ngModel)]="email"
+        name="email"
+        type="email"
+        placeholder="Digite seu email"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="token">Token:</label>
+      <input
+        id="token"
+        [(ngModel)]="token"
+        name="token"
+        type="text"
+        placeholder="Digite o token"
+        required
+      />
+    </div>
+
+    <button type="submit">Validar Token</button>
+  </form>
+
+  <!-- Mensagem para status de validação -->
+  <p *ngIf="isValidToken !== null">
+    Token {{ isValidToken ? 'válido' : 'inválido' }}
+  </p>
+</div>
+
+

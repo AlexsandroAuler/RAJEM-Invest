@@ -17,21 +17,23 @@ export class LiberarAcessoComponent {
   constructor(private authService: AuthService) {}
 
   gotoGerarToken() {
+    debugger;
     if (!this.email) {
       alert('Por favor, insira o email.');
       return;
     }
 
     this.authService.gerarToken(this.email).subscribe({
-      next: (token) => {
-        this.token = token; // O token é diretamente a string recebida
+      next: (response) => {
+        debugger;
+        this.token = response.token; // Acessa a propriedade token do objeto recebido
         console.log('Email:', this.email);
         console.log('Token gerado:', this.token);
       },
       error: (err) => {
         console.error('Erro ao gerar o token:', err);
       }
-    });
+    });    
   }
   copyToken() {
     if (this.token) {

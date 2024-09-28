@@ -21,6 +21,7 @@ export class IndexLoginComponent {
     this.router.navigate(['/primeiro-login']);
   }
   gotoLogin() {
+    debugger;
     // Lógica para fazer login (pode incluir autenticação)
     console.log('Usuário:', this.username);
     console.log('Senha:', this.password);

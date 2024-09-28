@@ -1,54 +1,39 @@
+// auth.service.ts
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
+// Definição da interface para a resposta do token
+export interface TokenResponse {
+  token: string; // A propriedade que contém o token gerado
+}
 
 @Injectable({
   providedIn: 'root' // Isso garante que o serviço esteja disponível em toda a aplicação
 })
 export class AuthService {
-  apiUrl: any;
-  email : any;
+  private apiUrl = 'http://localhost:3000'; // Defina o URL da API
 
-  constructor(private http: HttpClient) { }
-  
+  constructor(private http: HttpClient) {}
+
+  // Método para realizar o login
   login(username: string, password: string): Observable<any> {
     return this.http.post('/login', { username, password });
   }
 
-  createToken(email: string): Observable<any> {
-    debugger;
-    return this.http.post('/createToken', { email });
+  // Método para criar um token a partir do email
+  gerarToken(email: string): Observable<TokenResponse> {
+    return this.http.post<TokenResponse>(`${this.apiUrl}/createToken`, { email });
   }
 
-  // Método para enviar o email e receber o token - TESTE
-  gerarToken(email: string): Observable<string> {
-  debugger;
-    //Método para enviar o email e receber o token
-    // fetch('http://localhost:3000/createToken', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify({
-    //     email: 'alex@teste.com'
-    //   })
-    // })
-    //   .then(response => response.json())
-    //   .then(data => console.log('Success:', data))
-    //   .catch(error => console.error('Error:', error));
-
-
-    return this.http.post<string>(`http://localhost:3000/createToken`, { email });
-  }
-
+  // Método para validar um token
   validarToken(email: string, token: string): Observable<boolean> {
-    // Método para enviar o email e receber o token - TESTE
+    // Aqui você deve implementar a lógica para validar o token
+    // Por enquanto, vamos simular que a validação sempre retorna verdadeiro
     return of(true);
-
-    //Método para enviar o email e receber o token 
-    return this.http.post<boolean>(`${this.apiUrl}/validar-token`, { email, token });
+    
+    // Se você tiver uma API para validar o token, use a linha abaixo
+    // return this.http.post<boolean>(`${this.apiUrl}/validar-token`, { email, token });
   }
 }
-

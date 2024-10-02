@@ -31,9 +31,9 @@ export class AuthService {
   validarToken(email: string, token: string): Observable<boolean> {
     // Aqui você deve implementar a lógica para validar o token
     // Por enquanto, vamos simular que a validação sempre retorna verdadeiro
-    return of(true);
+    //return of(true);
     
     // Se você tiver uma API para validar o token, use a linha abaixo
-    // return this.http.post<boolean>(`${this.apiUrl}/validar-token`, { email, token });
+     return this.http.post<boolean>(`${this.apiUrl}/validar-token`, { email, token });
   }
 }

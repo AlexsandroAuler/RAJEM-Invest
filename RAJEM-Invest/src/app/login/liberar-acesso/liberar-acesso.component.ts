@@ -25,10 +25,7 @@ export class LiberarAcessoComponent {
 
     this.authService.gerarToken(this.email).subscribe({
       next: (response) => {
-        debugger;
         this.token = response.token; // Acessa a propriedade token do objeto recebido
-        console.log('Email:', this.email);
-        console.log('Token gerado:', this.token);
       },
       error: (err) => {
         console.error('Erro ao gerar o token:', err);

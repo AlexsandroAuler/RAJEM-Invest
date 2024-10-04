@@ -26,6 +26,7 @@ export class PrimeiroLoginComponent {
 
     this.authService.validarToken(this.email, this.token).subscribe({
       next: (isValid) => {
+      debugger;
         this.isValidToken = true; // Armazena o valor booleano recebido
         if (this.isValidToken) {
           // Redirecionar para a rota dados-primeiro-login

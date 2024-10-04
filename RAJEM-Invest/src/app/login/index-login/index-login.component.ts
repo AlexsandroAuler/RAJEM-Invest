@@ -22,8 +22,6 @@ export class IndexLoginComponent {
   }
   gotoLogin() {
     // Lógica para fazer login (pode incluir autenticação)
-    console.log('Usuário:', this.username);
-    console.log('Senha:', this.password);
 
     if (this.username === 'rodrigo' && this.password.trim() === ''){
       this.router.navigate(['/liberar-acesso']);

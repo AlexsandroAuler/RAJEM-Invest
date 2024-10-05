@@ -29,8 +29,6 @@ const userSchema = new mongoose.Schema({
   
   const User = mongoose.model('User', userSchema);
 
-  
-
 function generateUniqueToken(email) {
     const secret = 'RajemSecretKey';
     token = crypto.createHmac('sha256', secret).update(email).digest('hex');
@@ -44,8 +42,6 @@ function generateUniqueToken(email) {
 function hashPassword(password){
     const secret = 'RajemPassword';
     senhaHash = crypto.createHmac('sha256', secret).update(password).digest('hex');
-
-    console.log('Senha hash:', senhaHash)
 
     return senhaHash;
 }
@@ -100,11 +96,11 @@ async function validateToken(email, token) {
     }
 }
 
-async function salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, rua, bairro, cidade, numero, complemento, senha) {
+async function salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, rua, bairro, cidade, numero, complemento, email, senha) {
     const senhaHash = hashPassword(senha);
 
   // Criando o novo usuário
-  const newUser = new User({
+  const newUser = {
       nome,
       sobrenome,
       rg,
@@ -117,8 +113,9 @@ async function salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, r
       cidade,
       numero,
       complemento,
+      email,
       senhaHash
-  });
+  };
 
   await client.connect();
   console.log("Conectado ao MongoDB");
@@ -130,4 +127,26 @@ async function salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, r
   return result;
 }
 
-module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco };
+async function login(email, senha){
+    const senhaHash = hashPassword(senha);
+
+    await client.connect();
+    console.log("Conectado ao MongoDB");
+
+    const database = client.db('RajemBase');
+    const collection = database.collection('usuarios');
+
+    const query = { email: email, senhaHash: senhaHash };
+
+    const result = await collection.findOne(query);
+
+    if (result) {
+      console.log('Usuário válido');
+      return result;
+    } else {
+      console.log('Usuário inválido');
+      return false;
+    }
+}
+
+module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login };

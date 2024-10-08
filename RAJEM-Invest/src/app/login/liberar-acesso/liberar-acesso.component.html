@@ -1,11 +1,12 @@
+<body>
 <!-- liberar-acesso.component.html -->
 <div class="liberar-acesso">
-  <h2>Configuração do Primeiro Login</h2>
+  
   
   <!-- Formulário para inserção de email -->
   <form (ngSubmit)="gotoGerarToken()">
     <div class="form-group">
-      <label for="email">Email:</label>
+      <label for="email">Informe o email do investidor</label>
       <input
         id="email"
         [(ngModel)]="email"
@@ -27,5 +28,8 @@
     <button type="submit">Gerar Token</button>
   </form>
 </div>
-
+<div class="title">
+  <h3>RAJEM INVEST</h3>
+</div>
+</body>
   

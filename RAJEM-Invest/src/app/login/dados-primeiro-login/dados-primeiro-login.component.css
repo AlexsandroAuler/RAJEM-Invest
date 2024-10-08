@@ -14,16 +14,13 @@
   }
   
   .container {
-    width: 80%;
-    max-width: 1200px;
-    background-color: #fff;
+    background-color: white;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
   
   .form-container {
@@ -33,21 +30,32 @@
   }
   
   .form-left {
-    width: 60%;
+    height: 400px;
+    width: 550px;
     display: flex;
     flex-direction: column;
+    margin-right: 10px;
   }
   
   .form-right {
-    width: 40%;
+    height: 400px;
+    width: 550px;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-left: 1px solid black;
+    text-align: center;
+    padding: 40px;
+    font-weight: bolder;
+   
   }
   
-  .form-right h1 {
-    font-size: 36px;
-    color: #29A79B;
+  .form-right h3{
+    font-family: sans-serif;
+    font-size: 74px;
+    color: #41BFB3;
+    font-weight: 900;
+    
   }
   
   .form-row {
@@ -67,12 +75,12 @@
   button {
     width: 100%;
     padding: 10px;
-    background-color: #29A79B;
+    background-color: #2a8c82;
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
   }
   
   button:hover {

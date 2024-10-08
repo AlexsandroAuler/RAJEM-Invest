@@ -1,15 +1,40 @@
+body{
+  display: flex;
+  flex-direction: row;
+}
 /* primeiro-login.component.css */
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 400px;
+    width: 550px;
     text-align: center;
+    background-color: white;
+    border-right: 1px solid black;
+    padding: 40px;
+  }
+
+  .title{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    font-family: sans-serif;
+    font-size: 64px;
+    color: #41BFB3;
+    padding: 40px;
+    text-align: center;
+    flex: 1;
+    height: 400px;
+    width: 550px;
+    font-weight: bolder;
   }
   
-  h2 {
-    margin-bottom: 1rem;
+  h3{
+    margin: 0;
+    font-weight: 900;
   }
   
   .form-group {
@@ -21,7 +46,7 @@
   label {
     display: block;
     margin-bottom: 0.5rem;
-    font-weight: bold;
+    text-align: left;
   }
   
   input {
@@ -35,14 +60,14 @@
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
-    background-color: #007bff;
+    background-color: #2a8c82;
     color: white;
     font-size: 1rem;
     cursor: pointer;
   }
   
   button:hover {
-    background-color: #0056b3;
+    background-color: #2a8c82;
   }
   
   p {

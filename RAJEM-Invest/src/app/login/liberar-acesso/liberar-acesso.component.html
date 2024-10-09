@@ -5,17 +5,21 @@
   
   <!-- Formulário para inserção de email -->
   <form (ngSubmit)="gotoGerarToken()">
-    <div class="form-group">
-      <label for="email">Informe o email do investidor</label>
-      <input
-        id="email"
-        [(ngModel)]="email"
-        name="email"
-        type="email"
-        placeholder="Digite seu email"
-        required
-      />
-    </div>
+    <div class="acesso-inicial">
+      <div class="form-group">
+        <label for="email">Informe o email do investidor</label>
+        <input
+          id="email"
+          [(ngModel)]="email"
+          name="email"
+          type="email"
+          placeholder="Digite seu email"
+          required
+        />
+      </div>
+      <!-- Botão para gerar o token -->
+      <button type="submit">Gerar Token</button>
+    </div>  
 
     <!-- Exibindo o token se disponível -->
     <div class="token-display" *ngIf="token">
@@ -24,8 +28,7 @@
       <button (click)="copyToken()">Copiar Token</button>
     </div>
     
-    <!-- Botão para gerar o token -->
-    <button type="submit">Gerar Token</button>
+
   </form>
 </div>
 <div class="title">

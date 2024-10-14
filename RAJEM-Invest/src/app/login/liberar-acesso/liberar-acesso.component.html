@@ -6,7 +6,7 @@
   <!-- Formulário para inserção de email -->
   <form (ngSubmit)="gotoGerarToken()">
     <div class="acesso-inicial">
-      <div class="form-group">
+      <div class="form-group" *ngIf="exibirFormGroup">
         <label for="email">Informe o email do investidor</label>
         <input
           id="email"
@@ -18,14 +18,16 @@
         />
       </div>
       <!-- Botão para gerar o token -->
-      <button type="submit">Gerar Token</button>
+      <button type="submit" *ngIf="exibirFormGroup">Gerar Token</button>
     </div>  
 
     <!-- Exibindo o token se disponível -->
     <div class="token-display" *ngIf="token">
       <p>Email : {{ email }}</p>
-      <p>Token: {{ token }}</p>
+      <p>Token: </p>
+      <span class="token">{{ token }}</span>
       <button (click)="copyToken()">Copiar Token</button>
+      <button (click)="goHome()" style="background-color: gray;">Voltar</button>
     </div>
     
 

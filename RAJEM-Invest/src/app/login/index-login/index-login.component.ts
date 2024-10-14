@@ -22,8 +22,8 @@ export class IndexLoginComponent {
   }
   gotoLogin() {
     // Lógica para fazer login (pode incluir autenticação)
-
-    if (this.username === 'rodrigo' && this.password.trim() === ''){
+    debugger;
+    if (this.username === 'analista@rajem.com.br'){
       this.router.navigate(['/liberar-acesso']);
     }else{
       alert('Informe Login e senha')

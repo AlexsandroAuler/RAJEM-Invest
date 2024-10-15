@@ -12,15 +12,16 @@ const hostname = '127.0.0.1';
 const port = 3000;
 
 //rota para salvar usuário
-app.post('/enviar-informacoes', async (req, res) => {
+app.post('/dados-primeiro-login', async (req, res) => {
+  debugger;
   const {
-    nome, sobrenome, rg, cpf, ddd, celular, cep, rua, bairro,
-    cidade, numero, complemento, email, senha, confirmarSenha
+    emailRecuperacao, senha, confirmarSenha, email
   } = req.body;
 
+
+
   // Verificação se todos os campos estão preenchidos
-  if (!nome || !sobrenome || !rg || !cpf || !ddd || !celular || !cep || !rua ||
-    !bairro || !cidade || !numero || !email ||!senha || !confirmarSenha) {
+  if (!emailRecuperacao || !email ||!senha || !confirmarSenha) {
     return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
   }
 
@@ -29,7 +30,7 @@ app.post('/enviar-informacoes', async (req, res) => {
     return res.status(400).json({ error: 'As senhas não coincidem.' });
   }
 
-  var usuario = await salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, rua, bairro, cidade, numero, complemento, email, senha);
+  var usuario = await salvarUsuarioBanco(emailRecuperacao, senha);
 
   if(usuario){
     res.status(201).json({ message: 'Informações salvas com sucesso.' });
@@ -58,6 +59,7 @@ app.post('/createToken', async(req, res) => {
 });
 
 app.post('/validar-token', async(req, res) => {
+  debugger;
   const { email } = req.body;
   const { token } = req.body;
 
@@ -108,6 +110,7 @@ app.post('/login', async(req, res) => {
 });
 
 app.post('/validar-token', (req, res) => {
+  debugger;
   const { email } = req.body;
   const { token } = req.body;
 

@@ -20,7 +20,6 @@ export class DadosPrimeiroLoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   enviarDados() {
-    debugger;
     if (this.senha !== this.confirmarSenha) {
       alert('As senhas não coincidem.');
       return;
@@ -36,7 +35,7 @@ export class DadosPrimeiroLoginComponent {
     this.authService.enviarDadosPrimeiroLogin(dados).subscribe({
       next: (response: any) => {
         alert('Informações salvas com sucesso.');
-        this.router.navigate(['/login']);
+        this.router.navigate(['']);
       },
       error: (err: any) => {
         console.error('Erro ao salvar as informações:', err);

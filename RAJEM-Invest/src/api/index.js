@@ -29,12 +29,17 @@ const userSchema = new mongoose.Schema({
   
   const User = mongoose.model('User', userSchema);
 
-function generateUniqueToken(email) {
+async function generateUniqueToken(email) {
     const secret = 'RajemSecretKey';
     token = crypto.createHmac('sha256', secret).update(email).digest('hex');
 
+    const tokenJaGerado = await tokenExiste(token);
+
+    if(tokenJaGerado)
+        return;
+    
     console.log('Token gerado:', token);
-    saveTokenToDatabase(email, token);
+    await saveTokenToDatabase(email, token);
 
     return token;
 }
@@ -77,6 +82,22 @@ async function saveTokenToDatabase(email, token) {
         await client.close();
     }
 }
+async function tokenExiste(token){
+    await client.connect();
+    console.log("Conectado ao MongoDB");
+
+    const database = client.db('RajemBase');
+    const collection = database.collection('tokens');
+
+    const query = {token: token };
+    const result = await collection.findOne(query);
+
+    if (result) {
+        return true;
+      } else {
+        return false;
+      }
+}
 
 async function validateToken(email, token) {
     await client.connect();
@@ -96,11 +117,32 @@ async function validateToken(email, token) {
     }
 }
 
-async function salvarUsuarioBanco(emailRecuperacao, senha) {
+async function validarEmailJaCadastrado(email) {
+  await client.connect();
+  console.log("Conectado ao MongoDB");
+
+  const database = client.db('RajemBase');
+  const collection = database.collection('usuarios');
+
+  const query = { email: email };
+  const result = await collection.findOne(query);
+
+  if (result) {
+    console.log('Usuário já cadastrado');
+    return true;
+  } else {
+    console.log('Usuário não cadastrado');
+    return false;
+  }
+}
+
+async function salvarUsuarioBanco(email, emailRecuperacao, senha) {
+
     const senhaHash = hashPassword(senha);
 
   // Criando o novo usuário
   const newUser = {
+      email,
       emailRecuperacao,
       senhaHash
   };
@@ -137,4 +179,4 @@ async function login(email, senha){
     }
 }
 
-module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login };
+module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado };

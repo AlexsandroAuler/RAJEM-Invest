@@ -1,5 +1,4 @@
 // auth.service.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -17,6 +16,11 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+   // Método para enviarDadosPrimeiroLogin
+  enviarDadosPrimeiroLogin(dados: { emailRecuperacao: string; senha: string; confirmarSenha: string; }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/dados-primeiro-login`, dados);
+  }
+
   // Método para realizar o login
   login(username: string, password: string): Observable<any> {
     return this.http.post('/login', { username, password });
@@ -29,6 +33,7 @@ export class AuthService {
 
   // Método para validar um token
   validarToken(email: string, token: string): Observable<boolean> {
+    debugger;
     // Aqui você deve implementar a lógica para validar o token
     // Por enquanto, vamos simular que a validação sempre retorna verdadeiro
     //return of(true);

@@ -96,24 +96,12 @@ async function validateToken(email, token) {
     }
 }
 
-async function salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, rua, bairro, cidade, numero, complemento, email, senha) {
+async function salvarUsuarioBanco(emailRecuperacao, senha) {
     const senhaHash = hashPassword(senha);
 
   // Criando o novo usuário
   const newUser = {
-      nome,
-      sobrenome,
-      rg,
-      cpf,
-      ddd,
-      celular,
-      cep,
-      rua,
-      bairro,
-      cidade,
-      numero,
-      complemento,
-      email,
+      emailRecuperacao,
       senhaHash
   };
 

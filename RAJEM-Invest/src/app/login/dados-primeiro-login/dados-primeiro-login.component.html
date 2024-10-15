@@ -2,31 +2,34 @@
   <div class="container">
       <div class="form-container">
         <div class="form-left">
-          <form>
+          <form (ngSubmit)="enviarDados()">
             <div class="form-group">
               <label>Informe um email de recuperação</label>
               <input
-                id="emailreserva"
-                name="emailreserva"
+                id="emailRecuperacao"
+                name="emailRecuperacao"
                 type="text"
+                [(ngModel)]="emailRecuperacao"
                 required
               />
             </div>
             <div class="form-group">
               <label>Senha</label>
               <input
-                id="password"
-                name="password"
+                id="senha"
+                name="senha"
                 type="password"
+                [(ngModel)]="senha"
                 required
               />
             </div>
             <div class="form-group">
               <label>Confirmar senha</label>
               <input
-                id="password"
-                name="password"
+                id="confirmarSenha"
+                name="confirmarSenha"
                 type="password"
+                [(ngModel)]="confirmarSenha"
                 required
               />
             </div>

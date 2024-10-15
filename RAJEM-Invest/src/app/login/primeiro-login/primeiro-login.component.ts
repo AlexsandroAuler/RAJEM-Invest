@@ -27,9 +27,11 @@ export class PrimeiroLoginComponent {
     this.authService.validarToken(this.email, this.token).subscribe({
       next: (isValid) => {
       debugger;
-        this.isValidToken = true; // Armazena o valor booleano recebido
+        this.isValidToken = isValid; // Armazena o valor booleano recebido
         if (this.isValidToken) {
           // Redirecionar para a rota dados-primeiro-login
+          sessionStorage.setItem('token', this.token); // Armazena o token
+          sessionStorage.setItem('email', this.email); // Armazena o email inserido
           this.router.navigate(['/dados-primeiro-login']);
         } else {
           alert('Token inválido.'); // Mensagem de erro se o token for inválido

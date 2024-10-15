@@ -22,8 +22,8 @@ export class AuthService {
   }
 
   // Método para realizar o login
-  login(username: string, password: string): Observable<any> {
-    return this.http.post('/login', { username, password });
+  login(email: string, senha: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { email, senha });
   }
 
   // Método para criar um token a partir do email
@@ -33,12 +33,6 @@ export class AuthService {
 
   // Método para validar um token
   validarToken(email: string, token: string): Observable<boolean> {
-    debugger;
-    // Aqui você deve implementar a lógica para validar o token
-    // Por enquanto, vamos simular que a validação sempre retorna verdadeiro
-    //return of(true);
-    
-    // Se você tiver uma API para validar o token, use a linha abaixo
      return this.http.post<boolean>(`${this.apiUrl}/validar-token`, { email, token });
   }
 }

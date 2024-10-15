@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-index-login',
@@ -14,7 +15,7 @@ export class IndexLoginComponent {
   username: string = '';
   password: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   // Função para navegar até "primeiro-login"
   goToPrimeiroLogin() {
@@ -24,7 +25,6 @@ export class IndexLoginComponent {
   // Função de login
   gotoLogin() {
     // Lógica existente de navegação para "liberar-acesso" com email específico
-    debugger;
     
     if (this.username === 'analista@rajem.com.br') {
       if (this.password === 'analista@rajem.com.br') {  // Verifica se a senha foi inserida
@@ -34,9 +34,24 @@ export class IndexLoginComponent {
       } else {
         alert('Por favor, insira sua senha');
       }
-    } else {
-      alert('Acesso negado. Informe o email e senha corretos.');
+    } else if(!this.username || !this.password){
+      alert('Informe o email e senha.');
+    } else{
+      this.authService.login(this.username, this.password).subscribe({
+        next: (response: any) => {
+          if(response)
+            alert('Bem vindo ao sistema!');
+          else
+            alert('Usuário e/ou senha incorreto(s)!');
+        },
+        error: (err: any) => {
+          console.error('Erro ao salvar as informações:', err);
+          alert('Erro ao salvar as informações.');
+        }
+      });
     }
+
+
   }
 }
 

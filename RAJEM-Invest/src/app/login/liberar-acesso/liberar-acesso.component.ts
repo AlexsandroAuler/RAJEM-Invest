@@ -20,7 +20,6 @@ export class LiberarAcessoComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   gotoGerarToken() {
-    debugger;
     if (!this.email) {
       alert('Por favor, insira o email.');
       return;
@@ -28,8 +27,14 @@ export class LiberarAcessoComponent {
 
     this.authService.gerarToken(this.email).subscribe({
       next: (response) => {
-        this.token = response.token; // Acessa a propriedade token do objeto recebido
-        this.exibirFormGroup = false;
+        if(!response){
+          alert('E-mail já cadastrado na base de dados, não é possível gerar um novo token!');
+          this.email = '';
+        }
+        else{
+          this.token = response.token; // Acessa a propriedade token do objeto recebido
+          this.exibirFormGroup = false;
+        }
       },
       error: (err) => {
         console.error('Erro ao gerar o token:', err);

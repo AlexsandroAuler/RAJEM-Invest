@@ -3,7 +3,6 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 export const authGuard: CanActivateFn = (route, state) => {
-  debugger;
   const token = sessionStorage.getItem('token'); // Verifica o token
   const email = sessionStorage.getItem('email'); // Verifica o email armazenado
   

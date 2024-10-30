@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion  } = require('mongodb');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const { getAll } = require('./braviapi');
 
 const uri = 'mongodb+srv://RajemBase:Rajem$@baserajem.dxyth.mongodb.net/?retryWrites=true&w=majority&appName=BaseRAJEM';
 const client = new MongoClient(uri, {
@@ -177,6 +178,10 @@ async function login(email, senha){
       console.log('Usuário inválido');
       return false;
     }
+}
+
+async function getAllActions(){
+  var actions = await getAll();
 }
 
 module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado };

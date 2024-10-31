@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms'; // Importando FormsModule
 import { CommonModule } from '@angular/common'; // Importando CommonModule
 import { AuthService } from '../../services/auth.service';
+
 
 @Component({
   selector: 'app-liberar-acesso',
@@ -13,11 +15,11 @@ import { AuthService } from '../../services/auth.service';
 export class LiberarAcessoComponent {
   email: string = '';
   token: string | null = null;
+  exibirFormGroup: boolean = true;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   gotoGerarToken() {
-    debugger;
     if (!this.email) {
       alert('Por favor, insira o email.');
       return;
@@ -25,7 +27,14 @@ export class LiberarAcessoComponent {
 
     this.authService.gerarToken(this.email).subscribe({
       next: (response) => {
-        this.token = response.token; // Acessa a propriedade token do objeto recebido
+        if(!response){
+          alert('E-mail já cadastrado na base de dados, não é possível gerar um novo token!');
+          this.email = '';
+        }
+        else{
+          this.token = response.token; // Acessa a propriedade token do objeto recebido
+          this.exibirFormGroup = false;
+        }
       },
       error: (err) => {
         console.error('Erro ao gerar o token:', err);
@@ -42,5 +51,8 @@ export class LiberarAcessoComponent {
     } else {
       alert('Nenhum token para copiar.');
     }
+  }
+  goHome(){
+    this.router.navigate(['']);
   }
 }

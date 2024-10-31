@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion  } = require('mongodb');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const { getAll } = require('./braviapi');
 
 const uri = 'mongodb+srv://RajemBase:Rajem$@baserajem.dxyth.mongodb.net/?retryWrites=true&w=majority&appName=BaseRAJEM';
 const client = new MongoClient(uri, {
@@ -29,14 +30,17 @@ const userSchema = new mongoose.Schema({
   
   const User = mongoose.model('User', userSchema);
 
-  
-
-function generateUniqueToken(email) {
+async function generateUniqueToken(email) {
     const secret = 'RajemSecretKey';
     token = crypto.createHmac('sha256', secret).update(email).digest('hex');
 
+    const tokenJaGerado = await tokenExiste(token);
+
+    if(tokenJaGerado)
+        return;
+    
     console.log('Token gerado:', token);
-    saveTokenToDatabase(email, token);
+    await saveTokenToDatabase(email, token);
 
     return token;
 }
@@ -44,8 +48,6 @@ function generateUniqueToken(email) {
 function hashPassword(password){
     const secret = 'RajemPassword';
     senhaHash = crypto.createHmac('sha256', secret).update(password).digest('hex');
-
-    console.log('Senha hash:', senhaHash)
 
     return senhaHash;
 }
@@ -81,6 +83,22 @@ async function saveTokenToDatabase(email, token) {
         await client.close();
     }
 }
+async function tokenExiste(token){
+    await client.connect();
+    console.log("Conectado ao MongoDB");
+
+    const database = client.db('RajemBase');
+    const collection = database.collection('tokens');
+
+    const query = {token: token };
+    const result = await collection.findOne(query);
+
+    if (result) {
+        return true;
+      } else {
+        return false;
+      }
+}
 
 async function validateToken(email, token) {
     await client.connect();
@@ -100,25 +118,35 @@ async function validateToken(email, token) {
     }
 }
 
-async function salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, rua, bairro, cidade, numero, complemento, senha) {
+async function validarEmailJaCadastrado(email) {
+  await client.connect();
+  console.log("Conectado ao MongoDB");
+
+  const database = client.db('RajemBase');
+  const collection = database.collection('usuarios');
+
+  const query = { email: email };
+  const result = await collection.findOne(query);
+
+  if (result) {
+    console.log('Usuário já cadastrado');
+    return true;
+  } else {
+    console.log('Usuário não cadastrado');
+    return false;
+  }
+}
+
+async function salvarUsuarioBanco(email, emailRecuperacao, senha) {
+
     const senhaHash = hashPassword(senha);
 
   // Criando o novo usuário
-  const newUser = new User({
-      nome,
-      sobrenome,
-      rg,
-      cpf,
-      ddd,
-      celular,
-      cep,
-      rua,
-      bairro,
-      cidade,
-      numero,
-      complemento,
+  const newUser = {
+      email,
+      emailRecuperacao,
       senhaHash
-  });
+  };
 
   await client.connect();
   console.log("Conectado ao MongoDB");
@@ -130,4 +158,30 @@ async function salvarUsuarioBanco(nome, sobrenome, rg, cpf, ddd, celular, cep, r
   return result;
 }
 
-module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco };
+async function login(email, senha){
+    const senhaHash = hashPassword(senha);
+
+    await client.connect();
+    console.log("Conectado ao MongoDB");
+
+    const database = client.db('RajemBase');
+    const collection = database.collection('usuarios');
+
+    const query = { email: email, senhaHash: senhaHash };
+
+    const result = await collection.findOne(query);
+
+    if (result) {
+      console.log('Usuário válido');
+      return result;
+    } else {
+      console.log('Usuário inválido');
+      return false;
+    }
+}
+
+async function getAllActions(){
+  var actions = await getAll();
+}
+
+module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado };

@@ -4,8 +4,13 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEm
 
 const app = express();
 
+const corsOptions = {
+  origin: 'http://app.rodrigoflores.esy.es',
+  credentials: true, // se você precisar enviar cookies
+};
+
 // Middleware
-app.use(cors()); // Habilita o CORS para todas as rotas
+app.use(cors(corsOptions)); // Habilita o CORS para todas as rotas
 app.use(express.json()); // Para lidar com JSON no corpo das requisições
 
 const hostname = '127.0.0.1';

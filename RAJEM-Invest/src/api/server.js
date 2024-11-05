@@ -5,8 +5,10 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEm
 const app = express();
 
 const corsOptions = {
-  origin: '*',
+  origin: 'http://app.rodrigoflores.esy.es',
   credentials: true, // se você precisar enviar cookies
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos permitidos
+  optionsSuccessStatus: 200
 };
 
 // Middleware

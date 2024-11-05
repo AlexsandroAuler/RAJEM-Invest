@@ -39,7 +39,7 @@ app.post('/dados-primeiro-login', async (req, res) => {
 
   // Verificação se a senha e confirmação de senha são iguais
   if (senha !== confirmarSenha) {
-    return res.status(400).json({ error: 'As senhas não coincidem.' });
+    return res.status(400).json({ error: 'As senhas não coincidem' });
   }
 
   var usuario = await salvarUsuarioBanco(email, emailRecuperacao, senha);

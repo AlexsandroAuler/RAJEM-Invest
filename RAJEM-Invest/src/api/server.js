@@ -5,8 +5,10 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEm
 const app = express();
 
 const corsOptions = {
-  origin: '*',
+  origin: 'http://app.rodrigoflores.esy.es',
   credentials: true, // se você precisar enviar cookies
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos permitidos
+  optionsSuccessStatus: 200
 };
 
 // Middleware
@@ -37,7 +39,7 @@ app.post('/dados-primeiro-login', async (req, res) => {
 
   // Verificação se a senha e confirmação de senha são iguais
   if (senha !== confirmarSenha) {
-    return res.status(400).json({ error: 'As senhas não coincidem.' });
+    return res.status(400).json({ error: 'As senhas não coincidem' });
   }
 
   var usuario = await salvarUsuarioBanco(email, emailRecuperacao, senha);

@@ -5,7 +5,7 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEm
 const app = express();
 
 const corsOptions = {
-  origin: 'http://app.rodrigoflores.esy.es',
+  origin: '*',
   credentials: true, // se você precisar enviar cookies
 };
 
@@ -15,6 +15,16 @@ app.use(express.json()); // Para lidar com JSON no corpo das requisições
 
 const hostname = '127.0.0.1';
 const port = 3000;
+
+// Rota para lidar com a criação de token
+app.get('/teste', async(req, res) => {
+  try {
+    return res.status(200).json({ nome : 'rodrigo' });
+  } catch (error) {
+    console.error('Erro ao realizar login:', error);
+    return res.status(500).json({ error: 'Erro ao realizar login' });
+  }
+});
 
 //rota para salvar usuário
 app.post('/dados-primeiro-login', async (req, res) => {
@@ -156,3 +166,4 @@ app.use((req, res) => {
 app.listen(port, hostname, () => {
   console.log(`Servidor rodando em http://${hostname}:${port}/`);
 });
+

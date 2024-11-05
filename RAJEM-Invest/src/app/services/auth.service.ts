@@ -12,7 +12,7 @@ export interface TokenResponse {
   providedIn: 'root' // Isso garante que o serviço esteja disponível em toda a aplicação
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000'; // Defina o URL da API
+  private apiUrl = 'http://127.0.0.1:3000'; // Defina o URL da API
 
   constructor(private http: HttpClient) {}
 

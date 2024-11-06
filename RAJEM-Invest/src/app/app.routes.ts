@@ -19,5 +19,5 @@ export const appRoutes: Routes = [
   { path: 'criar-carteira', component: CriarCarteiraComponent },
   { path: 'editar-carteira/:id', component: EditarCarteiraComponent },
   { path: 'listar-carteira', component: ListCarteirasComponent },
-  { path: 'criar-carteira', component: NovaCarteiraComponent }
+  { path: 'criar-carteira', component: NovaCarteiraComponent },
 ];

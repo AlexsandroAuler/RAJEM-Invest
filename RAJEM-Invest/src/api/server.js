@@ -4,12 +4,29 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEm
 
 const app = express();
 
+const corsOptions = {
+  origin: 'http://app.rodrigoflores.esy.es',
+  credentials: true, // se você precisar enviar cookies
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos permitidos
+  optionsSuccessStatus: 200
+};
+
 // Middleware
-app.use(cors()); // Habilita o CORS para todas as rotas
+app.use(cors(corsOptions)); // Habilita o CORS para todas as rotas
 app.use(express.json()); // Para lidar com JSON no corpo das requisições
 
 const hostname = '127.0.0.1';
 const port = 3000;
+
+// Rota para lidar com a criação de token
+app.get('/teste', async(req, res) => {
+  try {
+    return res.status(200).json({ nome : 'rodrigo' });
+  } catch (error) {
+    console.error('Erro ao realizar login:', error);
+    return res.status(500).json({ error: 'Erro ao realizar login' });
+  }
+});
 
 //rota para salvar usuário
 app.post('/dados-primeiro-login', async (req, res) => {
@@ -22,7 +39,7 @@ app.post('/dados-primeiro-login', async (req, res) => {
 
   // Verificação se a senha e confirmação de senha são iguais
   if (senha !== confirmarSenha) {
-    return res.status(400).json({ error: 'As senhas não coincidem.' });
+    return res.status(400).json({ error: 'As senhas não coincidem' });
   }
 
   var usuario = await salvarUsuarioBanco(email, emailRecuperacao, senha);
@@ -151,3 +168,4 @@ app.use((req, res) => {
 app.listen(port, hostname, () => {
   console.log(`Servidor rodando em http://${hostname}:${port}/`);
 });
+

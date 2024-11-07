@@ -40,7 +40,7 @@ export class IndexLoginComponent {
       this.authService.login(this.username, this.password).subscribe({
         next: (response: any) => {
           if(response)
-            alert('Bem vindo ao sistema!');
+            this.router.navigate(['/listar-carteira']);
           else
             alert('Usuário e/ou senha incorreto(s)!');
         },

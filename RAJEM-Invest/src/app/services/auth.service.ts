@@ -16,7 +16,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-   // Método para enviarDadosPrimeiroLogin
+  // Método para enviarDadosPrimeiroLogin
   enviarDadosPrimeiroLogin(dados: { emailRecuperacao: string; senha: string; confirmarSenha: string; }): Observable<any> {
     return this.http.post(`${this.apiUrl}/dados-primeiro-login`, dados);
   }
@@ -35,4 +35,10 @@ export class AuthService {
   validarToken(email: string, token: string): Observable<boolean> {
      return this.http.post<boolean>(`${this.apiUrl}/validar-token`, { email, token });
   }
+
+  // Novo método para buscar as carteiras
+  getCarteiras(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/carteiras`);
+  }
 }
+

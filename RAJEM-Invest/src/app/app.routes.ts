@@ -16,8 +16,7 @@ export const appRoutes: Routes = [
   { path: 'primeiro-login', component: PrimeiroLoginComponent },
   { path: 'dados-primeiro-login', component: DadosPrimeiroLoginComponent, canActivate: [authGuard] },
   { path: 'liberar-acesso', component: LiberarAcessoComponent, canActivate: [authGuard] },
-  { path: 'criar-carteira', component: CriarCarteiraComponent },
   { path: 'editar-carteira/:id', component: EditarCarteiraComponent },
   { path: 'listar-carteira', component: ListCarteirasComponent },
-  { path: 'criar-carteira', component: NovaCarteiraComponent },
+  { path: 'criar-carteira', component: NovaCarteiraComponent }
 ];

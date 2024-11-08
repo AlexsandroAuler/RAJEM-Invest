@@ -1,4 +1,4 @@
-<div class="menu">
+<!-- <div class="menu">
     <header>
         <h1>RAJEM<br> INVEST</h1>
         <nav>
@@ -18,5 +18,34 @@
         <tr><td>Universidade</td></tr>
     </table>
     <br>
-    <button>Criar carteira</button>
-</div>
+    <button (click)=" criarCarteira()">Criar carteira</button>
+</div> -->
+<body>
+    <header>
+        <div class="nav">
+            <div class="logo">RAJEM <span class="invest">INVEST</span></div>
+            <nav>
+                <a href="#">Ativos</a>
+                <a href="#">Carteiras</a>
+            </nav>
+            <div class="profile">
+                <div class="avatar">J</div>
+                <div class="username">Nome investidor</div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="carteiras">
+            <h1>Minhas Carteiras</h1>
+            <div class="carteira-list">
+                <ul>
+                    <li *ngFor="let carteira of carteiras" > 
+                        {{ carteira.nome }}
+                    </li>
+                </ul>
+            </div>
+            <button class="create-carteira" (click)="criarCarteira()">Criar carteira</button>
+        </section>
+    </main>
+    
+</body>

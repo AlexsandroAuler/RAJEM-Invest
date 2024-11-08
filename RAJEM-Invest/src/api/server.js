@@ -4,16 +4,19 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEm
 
 const app = express();
 
-const corsOptions = {
-  origin: 'http://app.rodrigoflores.esy.es',
-  credentials: true, // se você precisar enviar cookies
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos permitidos
-  optionsSuccessStatus: 200
-};
+app.use(cors()); // Habilita o CORS para todas as rotas e origens
+app.use(express.json()); // Para lidar com JSON no corpo das requisições
+
+// const corsOptions = {
+//   origin: 'http://app.rodrigoflores.esy.es',
+//   credentials: true, // se você precisar enviar cookies
+//   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Métodos permitidos
+//   optionsSuccessStatus: 200
+// };
 
 // Middleware
-app.use(cors(corsOptions)); // Habilita o CORS para todas as rotas
-app.use(express.json()); // Para lidar com JSON no corpo das requisições
+// app.use(cors(corsOptions)); // Habilita o CORS para todas as rotas
+// app.use(express.json()); // Para lidar com JSON no corpo das requisições
 
 const hostname = '127.0.0.1';
 const port = 3000;

@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado,  getAllActions, getUserIdByEmail, saveNewWallet, GetListWallets } = require('./index');
+const { generateUniqueToken, validateToken, salvarUsuarioBanco, 
+  login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, 
+  saveNewWallet, GetListWallets, saveNewActionsOnWallet, 
+  removeActionsOnWallet, getWalletIdByName } = require('./index');
 
 const app = express();
 
@@ -146,7 +149,6 @@ app.post('/validar-token', async(req, res) => {
   }
   
   try {
-    // debugger;
     // const emailJaCadastrado = await validarEmailJaCadastrado(email);
     // console.log("emailJaCadastrado: " + emailJaCadastrado);
 
@@ -195,6 +197,39 @@ app.get('/get-all-Actions', async(req, res) => {
   result = await getAllActions();
 
   return res.status(200).json({ result : result });
+});
+
+app.post('/adicionar-acao-carteira', async(req, res) => {
+  const { email, nomeCarteira, idAcao, quantidadeAcao} = req.body;
+
+  const userId = await getUserIdByEmail(email);
+  const carteiraId = await getWalletIdByName(nomeCarteira);
+
+  if(userId == null || carteiraId == null || quantidadeAcao <= 0){
+    return res.status(400).json({ error: 'Ocorreu um erro com os dados enviado, por fazer revisar os seguintes dados => Email: ' +  email + " | Nome carteira: " + nomeCarteira + " | Quantidade Acoes: " + quantidadeAcao});
+  }
+
+  result = await saveNewActionsOnWallet(userId.toString(), carteiraId.toString(), idAcao, quantidadeAcao);
+
+  return res.status(200).json({ result : result });
+});
+
+//to do
+app.post('/remover-acao-carteira', async(req, res) => {
+  const { email, nomeCarteira, idAcao, quantidadeAcao} = req.body;
+  const userId = await getUserIdByEmail(email);
+  const carteiraId = await getWalletIdByName(nomeCarteira);
+
+  if(userId == null){
+    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
+  }
+  try{
+    result = await removeActionsOnWallet(userId.toString(), carteiraId.toString(), idAcao, quantidadeAcao);
+    return res.status(200).json({ result : true });
+  }catch(error){
+    console.error('Erro ao remover ações:', error);
+    res.status(500).json({ error: 'Erro interno ao remover ações.' });
+  }
 });
 
 //#endregion

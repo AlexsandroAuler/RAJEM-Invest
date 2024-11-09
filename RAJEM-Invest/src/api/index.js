@@ -186,6 +186,78 @@ async function GetListWallets(usuarioID) {
   return result;
 }
 
+async function saveNewActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+  const carteiraAcao = {
+    userID,
+    carteiraID,
+    acaoID,
+    quantidadeAcao,
+  };
+
+  var wallet = await existActionOnWallet(userID, carteiraID, acaoID);
+
+  if(wallet == null){
+    var result = await collection.insertOne(carteiraAcao);
+    return result?.insertedId;
+  }else{
+    const filtro = {
+      userID,
+      carteiraID,
+      acaoID
+    };
+    const update = {
+      $inc: { quantidadeAcao: + quantidadeAcao }
+    };
+    const result = await collection.updateOne(filtro, update);
+    return wallet._id;
+  }
+}
+
+async function removeActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcaoRemover) {
+  var quantity = await validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcaoRemover);
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+
+  const filtro = {
+    userID,
+    carteiraID,
+    acaoID
+  };
+
+  if(quantity == quantidadeAcaoRemover){
+    var result = await collection.deleteOne(filtro);
+  }else{
+    const update = {
+      $inc: { quantidadeAcao: - quantidadeAcaoRemover }
+    };
+    const result = await collection.updateOne(filtro, update);
+  }
+
+  return true;
+}
+
+async function validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
+  const wallet = await existActionOnWallet(userID, carteiraID, acaoID);
+
+  if(wallet == null)
+    throw new Error('Combinação de ação e carteira não encontrada.');
+
+  return wallet.quantidadeAcao;
+}
+
+async function existActionOnWallet(userID, carteiraID, acaoID) {
+  const carteiraAcao = {
+    userID,
+    carteiraID,
+    acaoID
+  };
+
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+  const result = await collection.findOne(carteiraAcao);
+
+  return result;
+}
+
 async function dataBaseCollectionConnection(collection){
   //foi configurado pra conectar por qualquer IP
   await client.connect();
@@ -199,4 +271,24 @@ async function getAllActions(){
   return actions;
 }
 
-module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, saveNewWallet, GetListWallets };
+async function getWalletIdByName(nomeCarteira) {
+  const collection = await dataBaseCollectionConnection('carteiras');
+  const query = { nomeCarteira: nomeCarteira };
+  const result = await collection.findOne(query);
+
+  return result?._id;
+}
+
+module.exports = { 
+  generateUniqueToken, 
+  validateToken, 
+  salvarUsuarioBanco, 
+  login, 
+  validarEmailJaCadastrado, 
+  getAllActions, 
+  getUserIdByEmail, 
+  saveNewWallet, 
+  GetListWallets, 
+  saveNewActionsOnWallet,
+  removeActionsOnWallet,
+  getWalletIdByName };

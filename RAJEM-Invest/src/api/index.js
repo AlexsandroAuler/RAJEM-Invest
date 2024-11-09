@@ -54,13 +54,8 @@ async function saveTokenToDatabase(email, token) {
     //usuario admin de teste
     //const uri = 'mongodb+srv://alexauler:yafQr3lG6oQzh5lQ@baserajem.dxyth.mongodb.net/?retryWrites=true&w=majority&appName=BaseRAJEM';
     
-    try {
-        //foi configurado pra conectar por qualquer IP
-        await client.connect();
-        console.log("Conectado ao MongoDB");
-
-        const database = client.db('RajemBase');
-        const collection = database.collection('tokens');
+    try {      
+        const collection = await dataBaseCollectionConnection('tokens');
 
         const tokenDocument = {
             email: email,
@@ -79,11 +74,7 @@ async function saveTokenToDatabase(email, token) {
     }
 }
 async function tokenExiste(token){
-    await client.connect();
-    console.log("Conectado ao MongoDB");
-
-    const database = client.db('RajemBase');
-    const collection = database.collection('tokens');
+    const collection = await dataBaseCollectionConnection('tokens');
 
     const query = {token: token };
     const result = await collection.findOne(query);
@@ -96,11 +87,7 @@ async function tokenExiste(token){
 }
 
 async function validateToken(email, token) {
-    await client.connect();
-    console.log("Conectado ao MongoDB");
-
-    const database = client.db('RajemBase');
-    const collection = database.collection('tokens');
+    const collection = await dataBaseCollectionConnection('tokens');
 
     const query = { email: email, token: token };
     const result = await collection.findOne(query);
@@ -116,11 +103,7 @@ async function validateToken(email, token) {
 //#endregion
 
 async function validarEmailJaCadastrado(email) {
-  await client.connect();
-  console.log("Conectado ao MongoDB");
-
-  const database = client.db('RajemBase');
-  const collection = database.collection('usuarios');
+  const collection = await dataBaseCollectionConnection('usuarios');
 
   const query = { email: email };
   const result = await collection.findOne(query);
@@ -145,11 +128,7 @@ async function salvarUsuarioBanco(email, emailRecuperacao, senha) {
       senhaHash
   };
 
-  await client.connect();
-  console.log("Conectado ao MongoDB");
-
-  const database = client.db('RajemBase');
-  const collection = database.collection('usuarios');
+  const collection = await dataBaseCollectionConnection('usuarios');
   const result = await collection.insertOne(newUser);
 
   return result;
@@ -157,12 +136,7 @@ async function salvarUsuarioBanco(email, emailRecuperacao, senha) {
 
 async function login(email, senha){
     const senhaHash = hashPassword(senha);
-
-    await client.connect();
-    console.log("Conectado ao MongoDB");
-
-    const database = client.db('RajemBase');
-    const collection = database.collection('usuarios');
+    const collection = await dataBaseCollectionConnection('usuarios');
 
     const query = { email: email, senhaHash: senhaHash };
 
@@ -213,6 +187,7 @@ async function GetListWallets(usuarioID) {
 }
 
 async function dataBaseCollectionConnection(collection){
+  //foi configurado pra conectar por qualquer IP
   await client.connect();
   const database = client.db('RajemBase');
 

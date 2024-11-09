@@ -28,7 +28,9 @@ const userSchema = new mongoose.Schema({
     senha: String
   });
   
-  const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+//#region Token
 
 async function generateUniqueToken(email) {
     const secret = 'RajemSecretKey';
@@ -43,13 +45,6 @@ async function generateUniqueToken(email) {
     await saveTokenToDatabase(email, token);
 
     return token;
-}
-
-function hashPassword(password){
-    const secret = 'RajemPassword';
-    senhaHash = crypto.createHmac('sha256', secret).update(password).digest('hex');
-
-    return senhaHash;
 }
 
 //"npm install mongodb" pra funcionar neh
@@ -118,6 +113,8 @@ async function validateToken(email, token) {
     }
 }
 
+//#endregion
+
 async function validarEmailJaCadastrado(email) {
   await client.connect();
   console.log("Conectado ao MongoDB");
@@ -180,8 +177,51 @@ async function login(email, senha){
     }
 }
 
-async function getAllActions(){
-  var actions = await getAll();
+function hashPassword(password){
+  const secret = 'RajemPassword';
+  senhaHash = crypto.createHmac('sha256', secret).update(password).digest('hex');
+
+  return senhaHash;
 }
 
-module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado };
+async function getUserIdByEmail(email){
+  const collection = await dataBaseCollectionConnection('usuarios');
+  const query = { email: email };
+  const result = await collection.findOne(query);
+
+  return result?._id;
+}
+
+async function saveNewWallet(usuarioID, nomeCarteira) {
+  const collection = await dataBaseCollectionConnection('carteiras');
+
+  const newWallet = {
+    usuarioID,
+    nomeCarteira
+  };
+
+  const result = await collection.insertOne(newWallet);
+  return result?.insertedId;
+}
+
+async function GetListWallets(usuarioID) {
+  const collection = await dataBaseCollectionConnection('carteiras');
+  const query = { usuarioID: usuarioID };
+  const result = await collection.find(query).toArray();
+
+  return result;
+}
+
+async function dataBaseCollectionConnection(collection){
+  await client.connect();
+  const database = client.db('RajemBase');
+
+  return database.collection(collection);
+}
+
+async function getAllActions(){
+  var actions = await getAll();
+  return actions;
+}
+
+module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, saveNewWallet, GetListWallets };

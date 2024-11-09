@@ -29,9 +29,9 @@
                 <a href="#">Carteiras</a>
             </nav>
             <div class="profile">
-                <div class="avatar">J</div>
-                <div class="username">Nome investidor</div>
-            </div>
+                <div class="avatar">{{ username ? username.charAt(0).toUpperCase() : 'U' }}</div> <!-- Primeira letra do username -->
+                <div class="username">{{ username || 'Nome investidor' }}</div> <!-- Mostra o username ou "Nome investidor" se não disponível -->
+            </div>  
         </div>
     </header>
     <main>

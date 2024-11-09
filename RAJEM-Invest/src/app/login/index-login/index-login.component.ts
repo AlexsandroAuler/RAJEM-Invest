@@ -39,8 +39,11 @@ export class IndexLoginComponent {
     } else{
       this.authService.login(this.username, this.password).subscribe({
         next: (response: any) => {
-          if(response)
+          if(response){
+            debugger;
+            sessionStorage.setItem('email', this.username);
             this.router.navigate(['/listar-carteira']);
+          }
           else
             alert('Usuário e/ou senha incorreto(s)!');
         },

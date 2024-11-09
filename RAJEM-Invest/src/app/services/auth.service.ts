@@ -37,8 +37,11 @@ export class AuthService {
   }
 
   // Novo método para buscar as carteiras
-  getCarteiras(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/carteiras`);
+  getCarteiras(email: string): Observable<{ result: any[] }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/listar-carteiras`, {
+      params: { email }, // Passa o email como query string
+    });
   }
+  
 }
 

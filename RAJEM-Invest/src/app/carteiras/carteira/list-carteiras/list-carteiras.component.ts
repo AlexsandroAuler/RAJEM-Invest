@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { firstValueFrom} from 'rxjs';
+import { CommonModule } from '@angular/common'; // Importa o CommonModule
 
 
 @Component({
   selector: 'app-list-carteiras',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './list-carteiras.component.html',
   styleUrls: ['./list-carteiras.component.css']
 })
@@ -27,11 +28,17 @@ export class ListCarteirasComponent implements OnInit {
 
   async carregarCarteiras(): Promise<void> {
     try {
-      this.carteiras = await firstValueFrom(this.authService.getCarteiras());
+      const email = sessionStorage.getItem('email') as string;
+      if(email){}
+        const response = await firstValueFrom(this.authService.getCarteiras(email));
+      this.carteiras = response.result; // Extrai o array de carteiras
+      console.log('Carteiras carregadas:', this.carteiras);
     } catch (erro) {
       console.error('Erro ao carregar carteiras:', erro);
     }
   }
+  
+  
   
 
   criarCarteira(): void {

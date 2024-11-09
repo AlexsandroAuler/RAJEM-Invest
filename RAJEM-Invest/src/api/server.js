@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado } = require('./index');
+const { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado,  getAllActions, getUserIdByEmail, saveNewWallet, GetListWallets } = require('./index');
 
 const app = express();
 
@@ -20,6 +20,8 @@ app.use(express.json()); // Para lidar com JSON no corpo das requisições
 
 const hostname = '127.0.0.1';
 const port = 3000;
+
+//#region Rotas
 
 // Rota para lidar com a criação de token
 app.get('/teste', async(req, res) => {
@@ -162,13 +164,50 @@ app.post('/validar-token', async(req, res) => {
   }
 });
 
+app.post('/criar-carteira', async(req, res) => {
+  const { email, nomeCarteira } = req.body;
+  const userIdByEmail = await getUserIdByEmail(email);
+
+  if(userIdByEmail == null){
+    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
+  }
+
+  result = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
+
+  res.status(200).json({ result: result });
+});
+
+app.get('/listar-carteiras', async(req, res) => {
+  const { email } = req.query;
+  const userIdByEmail = await getUserIdByEmail(email);
+  
+  if(userIdByEmail == null){
+    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
+  }
+
+  result = await GetListWallets(userIdByEmail.toString());
+
+  return res.status(200).json({ result : result });
+});
+
+app.get('/get-all-Actions', async(req, res) => {
+
+  result = await getAllActions();
+
+  return res.status(200).json({ result : result });
+});
+
+//#endregion
+
 // Rota para lidar com requisições desconhecidas (404)
 app.use((req, res) => {
   res.status(404).send('Rota não encontrada');
 });
 
-// Inicia o servidor
+//#region Inicia o servidor
 app.listen(port, hostname, () => {
   console.log(`Servidor rodando em http://${hostname}:${port}/`);
 });
+
+//#endregion
 

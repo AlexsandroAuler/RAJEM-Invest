@@ -40,8 +40,8 @@ export class IndexLoginComponent {
       this.authService.login(this.username, this.password).subscribe({
         next: (response: any) => {
           if(response){
-            debugger;
             sessionStorage.setItem('email', this.username);
+            sessionStorage.setItem('token', this.password);
             this.router.navigate(['/listar-carteira']);
           }
           else

@@ -1,36 +1,123 @@
-body{
-    display: flex;
-    flex-direction: row;
-    padding: max-content;
-    height: max-content;
-    width: max-content;
-  }
-  .container {
-      background-color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 40px;
-      height: 400px;
-      text-align: center;
-      border-right: 1px solid black;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+}
+
 header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    background-color: green;
-    padding: 20px 20px;
-    position: fixed top;
-  }
-  nav {
-    width: 200px;
-    display: flex;
-    justify-content: space-between;
-  }
-  img{
-    height: 5%;
-    width: 5%;
-  }   
+  background-color: #184c43;
+  color: white;
+  position: absolute;
+  top: 0px;
+  width: 1360px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.invest {
+  color: #f1f1f1;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin-right: 20px;
+  font-weight: bold;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  background-color: #ff007f;
+  color: white;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.username {
+  font-size: 14px;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  width: 1360px;
+}
+
+.carteiras {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 600px;
+}
+
+h1 {
+  color: #2fafa1;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.carteira-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.carteira-list li {
+  padding: 10px;
+  font-size: 16px;
+}
+
+
+.create-carteira {
+  margin: 20px 10px;
+  padding: 10px 20px;
+  background-color: #2fafa1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.voltar-carteira {
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: rgb(235, 38, 38);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.nomeCarteira{
+  padding: 15px;
+  border: solid 1px #c0c0c0;
+  width: 200px;
+  border-radius: 5px;
+}
+

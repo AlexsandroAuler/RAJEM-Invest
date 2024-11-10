@@ -42,6 +42,14 @@ export class AuthService {
       params: { email }, // Passa o email como query string
     });
   }
+
+  // Novo método para Adicionar as carteiras
+  adicionarCarteira(email: string, nomeCarteira: string): Observable<{ success: boolean; error?: string }> {
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/criar-carteira`, {
+      email,
+      nome: nomeCarteira // Envia o email e o nome da carteira
+    });
+  }
   
 }
 

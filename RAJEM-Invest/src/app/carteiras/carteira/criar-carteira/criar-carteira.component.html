@@ -1,18 +1,30 @@
-<div class="menu">
+<body>
     <header>
-        <h1>RAJEM<br> INVEST</h1>
-        <nav>
-            <a href='/ativos'>Ativos  </a>
-            <a href='/criar-carteira'>  Carteira</a>
-          </nav>
-            <img src="https://e7.pngegg.com/pngimages/894/403/png-clipart-computer-icons-user-abstract-logo-miscellaneous-desktop-wallpaper.png" alt="usuario">  
-            <p>nome usuario</p> 
-          
+        <div class="nav">
+            <div class="logo">RAJEM <span class="invest">INVEST</span></div>
+            <nav>
+                <a href="#">Ativos</a>
+                <a href="#">Carteiras</a>
+            </nav>
+            <div class="profile">
+                <div class="avatar">{{ username ? username.charAt(0).toUpperCase() : 'U' }}</div> <!-- Primeira letra do username -->
+                <div class="username">{{ username || 'Nome investidor' }}</div> <!-- Mostra o username ou "Nome investidor" se não disponível -->
+            </div>  
+        </div>
     </header>
-</div>
-<div class="container">
-    <h1>Minhas Carteiras</h1>
-    <label for="msg">Não há carteiras criadas</label>
-    <br>
-    <button>Criar carteira</button>
-</div>
+    <main>
+        <section class="carteiras">
+            <h1>Criar Carteira</h1>
+            <div class="carteira-list">
+                <ul>
+                    <li> 
+                        Nome da carteira:
+                    </li>
+                    <li><input class="nomeCarteira" type="text" placeholder="Digite aqui o nome da carteira"></li>
+                </ul>
+            </div> 
+            <button class="create-carteira" (click)="adicionarCarteira()">Adicionar carteira</button>
+            <button class="voltar-carteira" (click)="voltarCarteira()">Voltar</button>
+        </section>
+    </main>  
+</body>

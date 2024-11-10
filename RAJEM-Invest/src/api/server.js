@@ -167,14 +167,14 @@ app.post('/validar-token', async(req, res) => {
 });
 
 app.post('/criar-carteira', async(req, res) => {
-  const { email, nomeCarteira } = req.body;
+  const { email, nome } = req.body;
   const userIdByEmail = await getUserIdByEmail(email);
 
   if(userIdByEmail == null){
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
 
-  result = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
+  result = await saveNewWallet(userIdByEmail.toString(), nome);
 
   res.status(200).json({ result: result });
 });

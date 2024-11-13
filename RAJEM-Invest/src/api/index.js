@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion  } = require('mongodb');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 const { getAll } = require('./braviapi');
 
 const uri = 'mongodb+srv://RajemBase:Rajem$@baserajem.dxyth.mongodb.net/?retryWrites=true&w=majority&appName=BaseRAJEM';
@@ -186,6 +187,18 @@ async function GetListWallets(usuarioID) {
   return result;
 }
 
+async function GetSingleWallet(carteiraID) {
+  if (!ObjectId.isValid(carteiraID)) {
+    return null;
+  }
+
+  const collection = await dataBaseCollectionConnection('carteiras');
+  const query = { _id: new ObjectId(carteiraID) };
+  const result = await collection.findOne(query);
+
+  return result;
+}
+
 async function saveNewActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
   const collection = await dataBaseCollectionConnection('carteiraAcoes');
   const carteiraAcao = {
@@ -288,7 +301,8 @@ module.exports = {
   getAllActions, 
   getUserIdByEmail, 
   saveNewWallet, 
-  GetListWallets, 
+  GetListWallets,
+  GetSingleWallet, 
   saveNewActionsOnWallet,
   removeActionsOnWallet,
   getWalletIdByName };

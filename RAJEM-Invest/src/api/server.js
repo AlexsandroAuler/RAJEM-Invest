@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { generateUniqueToken, validateToken, salvarUsuarioBanco, 
   login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, 
-  saveNewWallet, GetListWallets, saveNewActionsOnWallet, 
+  saveNewWallet, GetListWallets, GetSingleWallet, saveNewActionsOnWallet, 
   removeActionsOnWallet, getWalletIdByName } = require('./index');
 
 const app = express();
@@ -167,14 +167,14 @@ app.post('/validar-token', async(req, res) => {
 });
 
 app.post('/criar-carteira', async(req, res) => {
-  const { email, nome } = req.body;
+  const { email, nomeCarteira } = req.body;
   const userIdByEmail = await getUserIdByEmail(email);
 
   if(userIdByEmail == null){
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
 
-  result = await saveNewWallet(userIdByEmail.toString(), nome);
+  result = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
 
   res.status(200).json({ result: result });
 });
@@ -188,6 +188,17 @@ app.get('/listar-carteiras', async(req, res) => {
   }
 
   result = await GetListWallets(userIdByEmail.toString());
+
+  return res.status(200).json({ result : result });
+});
+
+app.get('/get-carteira', async(req, res) => {
+  const { idCarteira } = req.query;
+
+  result = await GetSingleWallet(idCarteira);
+
+  if(!result)
+    return res.status(400).json({ error: 'Nenhum carteira encontrada' });
 
   return res.status(200).json({ result : result });
 });
@@ -214,7 +225,6 @@ app.post('/adicionar-acao-carteira', async(req, res) => {
   return res.status(200).json({ result : result });
 });
 
-//to do
 app.post('/remover-acao-carteira', async(req, res) => {
   const { email, nomeCarteira, idAcao, quantidadeAcao} = req.body;
   const userId = await getUserIdByEmail(email);

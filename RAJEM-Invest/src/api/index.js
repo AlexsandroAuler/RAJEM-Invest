@@ -2,7 +2,7 @@ const { MongoClient, ServerApiVersion  } = require('mongodb');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongodb');
-const { getAll } = require('./braviapi');
+const { getAll, getSpecificStock } = require('./braviapi');
 
 const uri = 'mongodb+srv://RajemBase:Rajem$@baserajem.dxyth.mongodb.net/?retryWrites=true&w=majority&appName=BaseRAJEM';
 const client = new MongoClient(uri, {
@@ -284,6 +284,11 @@ async function getAllActions(){
   return actions;
 }
 
+async function getSpecificAction(stockID){
+  var actions = await getSpecificStock(stockID);
+  return actions;
+}
+
 async function getWalletIdByName(nomeCarteira) {
   const collection = await dataBaseCollectionConnection('carteiras');
   const query = { nomeCarteira: nomeCarteira };
@@ -293,16 +298,18 @@ async function getWalletIdByName(nomeCarteira) {
 }
 
 module.exports = { 
-  generateUniqueToken, 
-  validateToken, 
-  salvarUsuarioBanco, 
-  login, 
-  validarEmailJaCadastrado, 
-  getAllActions, 
-  getUserIdByEmail, 
-  saveNewWallet, 
+  generateUniqueToken,
+  validateToken,
+  salvarUsuarioBanco,
+  login,
+  validarEmailJaCadastrado,
+  getAllActions,
+  getSpecificAction,
+  getUserIdByEmail,
+  saveNewWallet,
   GetListWallets,
-  GetSingleWallet, 
+  GetSingleWallet,
   saveNewActionsOnWallet,
   removeActionsOnWallet,
-  getWalletIdByName };
+  getWalletIdByName
+};

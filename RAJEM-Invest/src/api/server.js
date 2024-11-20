@@ -3,7 +3,7 @@ const cors = require('cors');
 const { generateUniqueToken, validateToken, salvarUsuarioBanco, 
   login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, 
   saveNewWallet, GetListWallets, GetSingleWallet, saveNewActionsOnWallet, 
-  removeActionsOnWallet, getWalletIdByName } = require('./index');
+  removeActionsOnWallet, getWalletIdByName, getSpecificAction } = require('./index');
 
 const app = express();
 
@@ -167,16 +167,30 @@ app.post('/validar-token', async(req, res) => {
 });
 
 app.post('/criar-carteira', async(req, res) => {
-  const { email, nomeCarteira } = req.body;
+  const { email, nomeCarteira, acoes  } = req.body;
   const userIdByEmail = await getUserIdByEmail(email);
 
   if(userIdByEmail == null){
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
 
-  result = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
+  idCarteira = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
+  console.log("acoes:" + acoes);
+  for (const acao of acoes) {
+    console.log("acaoID:" + acao.idAcao + " quantidade:" + acao.quantidade);
+    await saveNewActionsOnWallet(
+      userIdByEmail.toString(),
+      idCarteira.toString(),
+      acao.idAcao,
+      acao.quantidade
+    );
+  }
+  // for (const { id: idAcao, quantidade } of acoes) {
+  //   console.log("acaoID:" + idAcao + "quantidade:" + quantidade);
+  //   await saveNewActionsOnWallet(userIdByEmail.toString(), idCarteira.toString(), idAcao, quantidade);
+  // }
 
-  res.status(200).json({ result: result });
+  res.status(200).json({ result: idCarteira });
 });
 
 app.get('/listar-carteiras', async(req, res) => {
@@ -203,11 +217,31 @@ app.get('/get-carteira', async(req, res) => {
   return res.status(200).json({ result : result });
 });
 
-app.get('/get-all-Actions', async(req, res) => {
+app.get('/get-all-actions', async(req, res) => {
 
   result = await getAllActions();
 
   return res.status(200).json({ result : result });
+});
+
+app.get('/get-specific-action', async(req, res) => {
+  const { idAcao } = req.query;
+  try{
+    result = await getSpecificAction(idAcao);
+    result = result.stocks.filter(stock => stock.stock == idAcao);
+  
+    return res.status(200).json({ result : result });
+  }catch{
+    return res.status(400).json({ error : 'Ocorreu um erro ao buscar pelo ID da ação' });
+  }
+ 
+});
+
+app.get('/get-all-actions-names', async(req, res) => {
+  result = await getAllActions();
+  names = result.stocks.map(stock => stock.stock);
+
+  return res.status(200).json({ result : names });
 });
 
 app.post('/adicionar-acao-carteira', async(req, res) => {

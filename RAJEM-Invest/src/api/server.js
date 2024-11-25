@@ -166,6 +166,28 @@ app.post('/validar-token', async(req, res) => {
   }
 });
 
+app.post('/validar-quantidade-acoes', async(req, res) => {
+  const { investimentoInicial, acoes  } = req.body;
+  let retorno = [];
+
+  for (const acao of acoes) {
+    const valorTotalAcao = investimentoInicial * (acao.percentual / 100);
+    const detalhesAcao = await getSpecificAction(acao.idAcao);
+    const valorAcao = detalhesAcao[0].close;
+    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+
+    let acaoRetorno = {
+      idAcao: acao.idAcao,
+      percentual: acao.percentual,
+      quantidade: quantidadeDeAcoes,
+      cotacaoAtual: valorAcao
+    };
+    retorno.push(acaoRetorno);
+  }
+
+  res.status(200).json({ result: retorno });
+});
+
 app.post('/criar-carteira', async(req, res) => {
   const { email, nomeCarteira, acoes  } = req.body;
   const userIdByEmail = await getUserIdByEmail(email);
@@ -175,9 +197,8 @@ app.post('/criar-carteira', async(req, res) => {
   }
 
   idCarteira = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
-  console.log("acoes:" + acoes);
+
   for (const acao of acoes) {
-    console.log("acaoID:" + acao.idAcao + " quantidade:" + acao.quantidade);
     await saveNewActionsOnWallet(
       userIdByEmail.toString(),
       idCarteira.toString(),
@@ -185,10 +206,6 @@ app.post('/criar-carteira', async(req, res) => {
       acao.quantidade
     );
   }
-  // for (const { id: idAcao, quantidade } of acoes) {
-  //   console.log("acaoID:" + idAcao + "quantidade:" + quantidade);
-  //   await saveNewActionsOnWallet(userIdByEmail.toString(), idCarteira.toString(), idAcao, quantidade);
-  // }
 
   res.status(200).json({ result: idCarteira });
 });
@@ -228,8 +245,6 @@ app.get('/get-specific-action', async(req, res) => {
   const { idAcao } = req.query;
   try{
     result = await getSpecificAction(idAcao);
-    result = result.stocks.filter(stock => stock.stock == idAcao);
-  
     return res.status(200).json({ result : result });
   }catch{
     return res.status(400).json({ error : 'Ocorreu um erro ao buscar pelo ID da ação' });

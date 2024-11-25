@@ -21,10 +21,41 @@
                         Nome da carteira:
                     </li>
                     <li><input class="nomeCarteira" type="text" placeholder="Digite aqui o nome da carteira"></li>
+                    <li> 
+                        Valor de Investimento:
+                    </li>
+                    <li><input class="nomeCarteira" type="number" id="valorInvestimento" [(ngModel)]="valorInvestimento"  placeholder="Digite o valor do investimento"></li>
                 </ul>
             </div> 
             <button class="create-carteira" (click)="adicionarCarteira()">Adicionar carteira</button>
             <button class="voltar-carteira" (click)="voltarCarteira()">Voltar</button>
         </section>
+        
+        <section class="tabela-acoes">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Ação</th>
+                        <th>Percentual</th>
+                        <th>Cotação Atual</th>
+                        <th>Quantidade</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let linha of linhas; let i = index">
+                        <td><input type="text" [(ngModel)]="linha.idAcao"></td>
+                        <td><input type="number" [(ngModel)]="linha.percentual"></td>
+                        <td><input type="number" [value]="linha.cotacaoAtual" disabled></td>
+                        <td><input type="number" [value]="linha.quantidade" disabled></td>
+                        <td>
+                            <button (click)="removerLinha(i)">Remover</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button (click)="adicionarLinha()">Adicionar Ação</button>
+            <button (click)="calcularTabela()">Calcular Quantidades</button>
+        </section> 
     </main>  
 </body>

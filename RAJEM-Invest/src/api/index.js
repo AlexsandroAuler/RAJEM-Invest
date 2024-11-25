@@ -286,7 +286,8 @@ async function getAllActions(){
 
 async function getSpecificAction(stockID){
   var actions = await getSpecificStock(stockID);
-  return actions;
+  result = actions.stocks.filter(stock => stock.stock == stockID);
+  return result;
 }
 
 async function getWalletIdByName(nomeCarteira) {

@@ -40,9 +40,6 @@ export class ListCarteirasComponent implements OnInit {
       console.error('Erro ao carregar carteiras:', erro);
     }
   }
-  
-  
-  
 
   criarCarteira(): void {
     this.router.navigate(['/criar-carteira']);

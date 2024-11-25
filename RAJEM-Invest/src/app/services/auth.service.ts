@@ -50,6 +50,12 @@ export class AuthService {
       nome: nomeCarteira // Envia o email e o nome da carteira
     });
   }
-  
+
+  calcularQuantidades(valorInicial: number, acoes: Array<object>){
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/validar-quantidade-acoes`, {
+      investimentoInicial: valorInicial ,
+      acoes: acoes
+    });
+  }
 }
 

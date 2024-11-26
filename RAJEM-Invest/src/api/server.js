@@ -195,6 +195,9 @@ app.post('/criar-carteira', async(req, res) => {
   if(userIdByEmail == null){
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
+  if(nomeCarteira == null || nomeCarteira == ""){
+    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
+  }
 
   idCarteira = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
 

@@ -44,10 +44,11 @@ export class AuthService {
   }
 
   // Novo método para Adicionar as carteiras
-  adicionarCarteira(email: string, nomeCarteira: string): Observable<{ success: boolean; error?: string }> {
+  adicionarCarteira(email: string, nomeCarteira: string, acoes: Array<object>): Observable<{ success: boolean; error?: string }> {
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/criar-carteira`, {
       email,
-      nome: nomeCarteira // Envia o email e o nome da carteira
+      nomeCarteira,
+      acoes
     });
   }
 
@@ -57,5 +58,10 @@ export class AuthService {
       acoes: acoes
     });
   }
+
+  consultarIdsAcoes(): Observable<{ result: Array<string> }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-all-actions-names`, {});
+  }
+
 }
 

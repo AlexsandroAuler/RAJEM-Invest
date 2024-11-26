@@ -17,6 +17,7 @@ export class CriarCarteiraComponent {
   username : string = '';
   password: string = '';
   valorInvestimento: number = 0;
+  podeCriarCarteira: boolean = false;
 
   linhas: { idAcao: string; percentual: number; cotacaoAtual: number; quantidade: number }[] = [];
 
@@ -26,19 +27,30 @@ export class CriarCarteiraComponent {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.adicionarCarteira();
     this.username = sessionStorage.getItem('email') || '';
   }
 
+  //#region Criar Carteira
   async adicionarCarteira(): Promise<void> {
     try {
-      debugger;
+      if(!this.podeCriarCarteira)
+        return alert("Você deve calcular as quantidades antes de poder criar a sua carteira.");
+
       const email = sessionStorage.getItem('email') as string;
       const nomeCarteira = (document.querySelector('.nomeCarteira') as HTMLInputElement).value;
+
+      let acoes = new Array<any>();
+      //montar tabela de ações
+      this.linhas.forEach(linha => {
+        if (linha.percentual > 0) {
+          const acao = {"idAcao": linha.idAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": linha.cotacaoAtual, "percentualOriginal": linha.percentual};
+          acoes.push(acao);
+        }
+      });
       
-      if (email && nomeCarteira) {
+      if (email && nomeCarteira && acoes) {
         // Faz a requisição para adicionar uma nova carteira
-        const response = await firstValueFrom(this.authService.adicionarCarteira(email, nomeCarteira));
+        const response = await firstValueFrom(this.authService.adicionarCarteira(email, nomeCarteira, acoes));
         
         if (response) { // Supondo que o backend retorna um campo `success` na resposta
           alert('Carteira Adicionada com sucesso!')
@@ -50,17 +62,15 @@ export class CriarCarteiraComponent {
           console.error('Erro ao adicionar carteira:');
         }
       } else {
-        console.error('Email ou nome da carteira não fornecido');
+        console.error('Nome da carteira ou ações não fornecidas');
       }
     } catch (erro) {
       console.error('Erro ao adicionar carteira:', erro);
     }
   }
-  
+  //#endregion
 
-  voltarCarteira(): void{
-    this.router.navigate(['/listar-carteira']);
-  }
+  //#region Manipular Tabela
 
   adicionarLinha(): void {
     this.linhas.push({ idAcao: '', percentual: 0, cotacaoAtual: 0, quantidade: 0 });
@@ -69,7 +79,7 @@ export class CriarCarteiraComponent {
   removerLinha(index: number): void {
     this.linhas.splice(index, 1);
   }
-
+  
   calcularSomatoriaPercentuais(): boolean{
     let percentual = 0;
     this.linhas.forEach(linha => {percentual += linha.percentual});
@@ -82,10 +92,11 @@ export class CriarCarteiraComponent {
   
   async calcularTabela(): Promise<void> {
     if(!this.calcularSomatoriaPercentuais())
-      alert('A somatória dos percentuais deve ser igual a 100%')
-    if(this.valorInvestimento <= 0)
-      alert('O valor do investimento deve ser maior que 0 (zero)')
+      alert('A somatória dos percentuais deve ser igual a 100%');
+    else if(this.valorInvestimento <= 0)
+      alert('O valor do investimento deve ser maior que 0 (zero)');
     else{
+      
       let acoes = new Array<any>();
 
       this.linhas.forEach(linha => {
@@ -95,18 +106,39 @@ export class CriarCarteiraComponent {
         }
       });
 
+      if(await this.validarIdsAcoesTabela(acoes)){
+        return alert('Um ou mais IDs de ações foram informados incorretamente.');
+      }
+
       const response = await firstValueFrom(this.authService.calcularQuantidades(this.valorInvestimento, acoes));
-      debugger;
       this.ajustarTabela(response);
     }
   }
+  
   ajustarTabela(result: any): void{
     this.linhas.forEach(linha => {
-      debugger;
       var acaoRetorno = result.result.find((x: any) => x.idAcao === linha.idAcao);
       linha.quantidade = acaoRetorno.quantidade;
       linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
     });
+
+    this.podeCriarCarteira = true;
+  }
+  //#endregion
+
+  async validarIdsAcoesTabela(acoes: Array<any>): Promise<boolean>{
+    const nomesAcoes = await firstValueFrom(this.authService.consultarIdsAcoes());
+    let acaoIncorreta = false;
+    acoes.forEach(acao => {
+      if(!nomesAcoes.result.includes(acao.idAcao)){
+        acaoIncorreta = true;
+      }
+    });
+
+    return acaoIncorreta;
   }
 
+  voltarCarteira(): void{
+    this.router.navigate(['/listar-carteira']);
+  }
 }

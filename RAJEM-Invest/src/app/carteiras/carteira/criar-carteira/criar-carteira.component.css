@@ -120,3 +120,29 @@ h1 {
   width: 200px;
   border-radius: 5px;
 }
+
+.tabela-acoes th{
+  color: #2fafa1;
+  text-align: center;
+  margin-bottom: 20px;
+  border-left: 1px solid;
+}
+
+.buttonTabela{
+  margin: 20px 10px;
+  padding: 10px 20px;
+  background-color: #2fafa1;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px; 
+}
+
+.remover{
+  background-color: rgb(235, 38, 38);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;  
+}

@@ -49,13 +49,13 @@
                         <td><input type="number" [value]="linha.cotacaoAtual" disabled></td>
                         <td><input type="number" [value]="linha.quantidade" disabled></td>
                         <td>
-                            <button (click)="removerLinha(i)">Remover</button>
+                            <button class="remover" (click)="removerLinha(i)">Remover</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <button (click)="adicionarLinha()">Adicionar Ação</button>
-            <button (click)="calcularTabela()">Calcular Quantidades</button>
+            <button class="buttonTabela" (click)="adicionarLinha()">Adicionar Ação</button>
+            <button class="buttonTabela" (click)="calcularTabela()">Calcular Quantidades</button>
         </section> 
     </main>  
 </body>

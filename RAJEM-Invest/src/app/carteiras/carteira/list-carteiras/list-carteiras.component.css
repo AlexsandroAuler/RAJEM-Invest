@@ -121,3 +121,14 @@ h1 {
 .create-carteira:hover {
   background-color: #248f81;
 }
+
+.no-link {
+  text-decoration: none; 
+  color: inherit; 
+  cursor: default;
+}
+
+.no-link:hover,
+.no-link:focus {
+  text-decoration: none;
+}

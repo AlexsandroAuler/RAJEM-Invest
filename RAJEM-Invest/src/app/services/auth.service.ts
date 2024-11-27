@@ -43,11 +43,19 @@ export class AuthService {
     });
   }
 
+  // Novo método para buscar as iformações de uma carteira específica
+  getCarteira(email: string, carteiraId: string): Observable<{ result: any }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-carteira`, {
+      params: { email, carteiraId },
+    });
+  }
+
   // Novo método para Adicionar as carteiras
-  adicionarCarteira(email: string, nomeCarteira: string, acoes: Array<object>): Observable<{ success: boolean; error?: string }> {
+  adicionarCarteira(email: string, nomeCarteira: string, valorInvestimento: number, acoes: Array<object>): Observable<{ success: boolean; error?: string }> {
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/criar-carteira`, {
       email,
       nomeCarteira,
+      valorInvestimento,
       acoes
     });
   }

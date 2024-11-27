@@ -37,27 +37,28 @@ export class CriarCarteiraComponent {
         return alert("Você deve calcular as quantidades antes de poder criar a sua carteira.");
 
       const email = sessionStorage.getItem('email') as string;
-      const nomeCarteira = (document.querySelector('.nomeCarteira') as HTMLInputElement).value;
+      const nomeCarteira = (document.getElementById("nomeCarteira") as HTMLInputElement).value;
+      const valorInvestimento = Number((document.getElementById("valorInvestimento") as HTMLInputElement).value);
 
       let acoes = new Array<any>();
       //montar tabela de ações
       this.linhas.forEach(linha => {
         if (linha.percentual > 0) {
-          const acao = {"idAcao": linha.idAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": linha.cotacaoAtual, "percentualOriginal": linha.percentual};
+          const acao = {"idAcao": linha.idAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": Number(linha.cotacaoAtual), "percentualOriginal": linha.percentual};
           acoes.push(acao);
         }
       });
       
       if (email && nomeCarteira && acoes) {
         // Faz a requisição para adicionar uma nova carteira
-        const response = await firstValueFrom(this.authService.adicionarCarteira(email, nomeCarteira, acoes));
+        const response = await firstValueFrom(this.authService.adicionarCarteira(email, nomeCarteira, valorInvestimento, acoes));
         
         if (response) { // Supondo que o backend retorna um campo `success` na resposta
           alert('Carteira Adicionada com sucesso!')
           sessionStorage.setItem('email', this.username);
           this.router.navigate(['/listar-carteira']);
           // Opcionalmente, você pode limpar o campo de entrada após a adição
-          (document.querySelector('.nomeCarteira') as HTMLInputElement).value = '';
+          (document.getElementById("nomeCarteira") as HTMLInputElement).value = '';
         } else {
           console.error('Erro ao adicionar carteira:');
         }

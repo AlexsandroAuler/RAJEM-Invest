@@ -18,7 +18,7 @@
             <h1>Minhas Carteiras</h1>
                 <div class="carteira-list">
                     <ul>
-                        <li *ngFor="let carteira of carteiras" > 
+                        <li *ngFor="let carteira of carteiras" (click)="acessarCarteira(carteira._id)"> 
                             {{ carteira.nomeCarteira }}
                         </li>
                     </ul>

@@ -4,8 +4,6 @@ import { AuthService } from '../../../services/auth.service';
 import { firstValueFrom} from 'rxjs';
 import { CommonModule } from '@angular/common';
 
-
-
 @Component({
   selector: 'app-list-carteiras',
   standalone: true,
@@ -17,7 +15,8 @@ export class ListCarteirasComponent implements OnInit {
   nomeCarteira: string = '';
   carteiras: any[] = [];
   carteiraSelecionada: any = null;
-  username : string = '';
+  username: string = '';
+  baseUrlEdit: string = "http://localhost:4200/editar-carteira/";
 
   constructor(
     private authService: AuthService,
@@ -34,8 +33,7 @@ export class ListCarteirasComponent implements OnInit {
       const email = sessionStorage.getItem('email') as string;
       if(email){}
         const response = await firstValueFrom(this.authService.getCarteiras(email));
-      this.carteiras = response.result; // Extrai o array de carteiras
-      console.log('Carteiras carregadas:', this.carteiras);
+      this.carteiras = response.result;
     } catch (erro) {
       console.error('Erro ao carregar carteiras:', erro);
     }
@@ -45,11 +43,11 @@ export class ListCarteirasComponent implements OnInit {
     this.router.navigate(['/criar-carteira']);
   }
 
+  acessarCarteira(carteiraId: string): void{
+    this.router.navigate(['/editar-carteira/', carteiraId]);
+  }
+
   selecionarCarteira(carteira: any): void {
     this.carteiraSelecionada = carteira;
   }
 }
-
-
-
-

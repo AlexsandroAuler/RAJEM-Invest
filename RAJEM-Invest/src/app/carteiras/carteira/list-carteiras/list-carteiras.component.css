@@ -7,7 +7,7 @@ body {
 header {
   background-color: #184c43;
   color: white;
-  position: absolute;
+  position: fixed;
   top: 0px;
   width: 1360px;
   padding-top: 15px;
@@ -59,7 +59,10 @@ nav a {
 .username {
   font-size: 14px;
 }
-
+.scroll{ 
+  overflow: auto;
+  max-height: 80vh;
+}
 main {
   display: flex;
   justify-content: center;

@@ -12,17 +12,19 @@
             </div>  
         </div>
     </header>
-    <main>
+    <main>      
         <section class="carteiras">
+            <div class="scroll">
             <h1>Minhas Carteiras</h1>
-            <div class="carteira-list">
-                <ul>
-                    <li *ngFor="let carteira of carteiras" > 
-                        {{ carteira.nomeCarteira }}
-                    </li>
-                </ul>
-            </div> 
+                <div class="carteira-list">
+                    <ul>
+                        <li *ngFor="let carteira of carteiras" > 
+                            {{ carteira.nomeCarteira }}
+                        </li>
+                    </ul>
+                </div> 
+            </div>
             <button class="create-carteira" (click)="criarCarteira()">Criar carteira</button>
-        </section>
+     </section>
     </main>  
 </body>

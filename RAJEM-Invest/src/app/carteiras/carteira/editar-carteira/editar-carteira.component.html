@@ -3,7 +3,7 @@
         <div class="nav">
             <div class="logo">RAJEM <span class="invest">INVEST</span></div>
             <nav>
-                <a href="#">Carteira</a>
+                <a href="#">Carteiras</a>
                 <a href="#">Ações</a>
             </nav>
             <div class="profile">
@@ -16,14 +16,14 @@
         <section class="carteiras">
             <div class="scroll">
                 <h1>Carteira: {{carteiraInfo.carteira.nomeCarteira}}</h1>
-                <h3>Valor Total Alocado na Carteira: {{carteiraInfo.carteira.valorInvestimento}}</h3>
+                <h3>Valor Total Alocado na Carteira: R$ {{carteiraInfo.carteira.valorInvestimento}}</h3>
                 <div class="carteira-list">
                     <table class="tabela-carteira">
                         <thead>
                             <tr>
                                 <th>Ativo</th>
                                 <th>Quantidade</th>
-                                <th>Valor de Compra</th>
+                                <th>Valor de Compra (R$)</th>
                                 <th>Participação Definida (%)</th>
                             </tr>
                         </thead>

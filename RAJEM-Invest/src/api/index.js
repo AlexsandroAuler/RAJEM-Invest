@@ -167,12 +167,13 @@ async function getUserIdByEmail(email){
   return result?._id;
 }
 
-async function saveNewWallet(usuarioID, nomeCarteira) {
+async function saveNewWallet(usuarioID, nomeCarteira, valorInvestimento) {
   const collection = await dataBaseCollectionConnection('carteiras');
 
   const newWallet = {
     usuarioID,
-    nomeCarteira
+    nomeCarteira,
+    valorInvestimento
   };
 
   const result = await collection.insertOne(newWallet);
@@ -187,25 +188,37 @@ async function GetListWallets(usuarioID) {
   return result;
 }
 
-async function GetSingleWallet(carteiraID) {
+async function GetSingleWallet(carteiraID, userId) {
   if (!ObjectId.isValid(carteiraID)) {
     return null;
   }
 
-  const collection = await dataBaseCollectionConnection('carteiras');
-  const query = { _id: new ObjectId(carteiraID) };
-  const result = await collection.findOne(query);
+  const collectionCarteira = await dataBaseCollectionConnection('carteiras');
+  const queryCarteira = { _id: new ObjectId(carteiraID)};
+  const resultCarteira = await collectionCarteira.findOne(queryCarteira);
 
-  return result;
+  const collectionAcoesCarteira = await dataBaseCollectionConnection('carteiraAcoes');
+  const queryAcoesCarteira = { carteiraID: carteiraID};
+  const acoesCarteira = await collectionAcoesCarteira.find(queryAcoesCarteira).toArray();
+
+
+  const carteiraInfo = {
+    carteira: resultCarteira,
+    acoesCarteira: acoesCarteira
+  };
+
+  return carteiraInfo;
 }
 
-async function saveNewActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
+async function saveNewActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao, cotacaoMomentoCompra, percentualDefinidoParaCarteira) {
   const collection = await dataBaseCollectionConnection('carteiraAcoes');
   const carteiraAcao = {
     userID,
     carteiraID,
     acaoID,
     quantidadeAcao,
+    cotacaoMomentoCompra,
+    percentualDefinidoParaCarteira
   };
 
   var wallet = await existActionOnWallet(userID, carteiraID, acaoID);

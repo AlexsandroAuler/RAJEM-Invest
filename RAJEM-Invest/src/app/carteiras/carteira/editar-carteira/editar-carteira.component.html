@@ -1,1 +1,43 @@
-<p>editar-carteira works!</p>
+<body>
+    <header>
+        <div class="nav">
+            <div class="logo">RAJEM <span class="invest">INVEST</span></div>
+            <nav>
+                <a href="#">Carteira</a>
+                <a href="#">Ações</a>
+            </nav>
+            <div class="profile">
+                <div class="avatar">{{ username ? username.charAt(0).toUpperCase() : 'U' }}</div> <!-- Primeira letra do username -->
+                <div class="username">{{ username || 'Nome investidor' }}</div> <!-- Mostra o username ou "Nome investidor" se não disponível -->
+            </div>
+        </div>
+    </header>
+    <main>      
+        <section class="carteiras">
+            <div class="scroll">
+                <h1>Carteira: {{carteiraInfo.carteira.nomeCarteira}}</h1>
+                <h3>Valor Total Alocado na Carteira: {{carteiraInfo.carteira.valorInvestimento}}</h3>
+                <div class="carteira-list">
+                    <table class="tabela-carteira">
+                        <thead>
+                            <tr>
+                                <th>Ativo</th>
+                                <th>Quantidade</th>
+                                <th>Valor de Compra</th>
+                                <th>Participação Definida (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let acao of carteiraInfo.acoesCarteira">
+                                <td>{{ acao.acaoID }}</td>
+                                <td>{{ acao.quantidadeAcao }}</td>
+                                <td>{{ acao.cotacaoMomentoCompra }}</td>
+                                <td>{{ acao.percentualDefinidoParaCarteira }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>  
+</body>

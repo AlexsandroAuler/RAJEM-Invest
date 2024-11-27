@@ -20,11 +20,11 @@
                     <li> 
                         Nome da carteira:
                     </li>
-                    <li><input class="nomeCarteira" type="text" placeholder="Digite aqui o nome da carteira"></li>
+                    <li><input class="inputsPadrao" type="text" id="nomeCarteira" placeholder="Digite aqui o nome da carteira"></li>
                     <li> 
                         Valor de Investimento:
                     </li>
-                    <li><input class="nomeCarteira" type="number" id="valorInvestimento" [(ngModel)]="valorInvestimento"  placeholder="Digite o valor do investimento"></li>
+                    <li><input class="inputsPadrao" type="number" id="valorInvestimento" [(ngModel)]="valorInvestimento"  placeholder="Digite o valor do investimento"></li>
                 </ul>
             </div> 
             <button class="create-carteira" (click)="adicionarCarteira()">Adicionar carteira</button>

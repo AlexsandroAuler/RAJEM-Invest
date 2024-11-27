@@ -171,9 +171,14 @@ app.post('/validar-quantidade-acoes', async(req, res) => {
   let retorno = [];
 
   for (const acao of acoes) {
-    const valorTotalAcao = investimentoInicial * (acao.percentual / 100);
+    const valorTotalAcao = Number(investimentoInicial * (acao.percentual / 100));
+
     const detalhesAcao = await getSpecificAction(acao.idAcao);
-    const valorAcao = detalhesAcao[0].close;
+
+    const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
+    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
+    const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
+
     const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
 
     let acaoRetorno = {
@@ -189,9 +194,9 @@ app.post('/validar-quantidade-acoes', async(req, res) => {
 });
 
 app.post('/criar-carteira', async(req, res) => {
-  const { email, nomeCarteira, acoes  } = req.body;
+  const { email, nomeCarteira, valorInvestimento, acoes } = req.body;
   const userIdByEmail = await getUserIdByEmail(email);
-
+  
   if(userIdByEmail == null){
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
@@ -199,14 +204,16 @@ app.post('/criar-carteira', async(req, res) => {
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
 
-  idCarteira = await saveNewWallet(userIdByEmail.toString(), nomeCarteira);
+  idCarteira = await saveNewWallet(userIdByEmail.toString(), nomeCarteira, valorInvestimento);
 
   for (const acao of acoes) {
     await saveNewActionsOnWallet(
       userIdByEmail.toString(),
       idCarteira.toString(),
       acao.idAcao,
-      acao.quantidade
+      acao.quantidade,
+      acao.cotacaoMomentoCompra,
+      acao.percentualOriginal
     );
   }
 
@@ -227,9 +234,14 @@ app.get('/listar-carteiras', async(req, res) => {
 });
 
 app.get('/get-carteira', async(req, res) => {
-  const { idCarteira } = req.query;
+  const { email, carteiraId } = req.query;
+  const userIdByEmail = await getUserIdByEmail(email);
 
-  result = await GetSingleWallet(idCarteira);
+  if(userIdByEmail == null){
+    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
+  }
+
+  result = await GetSingleWallet(carteiraId, userIdByEmail);
 
   if(!result)
     return res.status(400).json({ error: 'Nenhum carteira encontrada' });

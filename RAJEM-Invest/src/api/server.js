@@ -193,6 +193,28 @@ app.post('/validar-quantidade-acoes', async(req, res) => {
   res.status(200).json({ result: retorno });
 });
 
+app.post('/consultar-cotacoes', async(req, res) => {
+  const { acoes  } = req.body;
+  let retorno = [];
+
+  for (const acao of acoes) {
+    const detalhesAcao = await getSpecificAction(acao.idAcao);
+    const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
+    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
+    const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
+
+    let acaoRetorno = {
+      idAcao: acao.idAcao,
+      setorAcao: detalhesAcao[0].sector,
+      cotacaoAtual: valorAcao
+    };
+
+    retorno.push(acaoRetorno);
+  }
+
+  res.status(200).json({ result: retorno });
+});
+
 app.post('/criar-carteira', async(req, res) => {
   const { email, nomeCarteira, valorInvestimento, acoes } = req.body;
   const userIdByEmail = await getUserIdByEmail(email);
@@ -204,16 +226,17 @@ app.post('/criar-carteira', async(req, res) => {
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
 
-  idCarteira = await saveNewWallet(userIdByEmail.toString(), nomeCarteira, valorInvestimento);
+  idCarteira = await saveNewWallet(userIdByEmail.toString(), nomeCarteira, 0);
 
   for (const acao of acoes) {
     await saveNewActionsOnWallet(
       userIdByEmail.toString(),
       idCarteira.toString(),
       acao.idAcao,
-      acao.quantidade,
-      acao.cotacaoMomentoCompra,
-      acao.percentualOriginal
+      acao.setorAcao,
+      0,
+      0,
+      0
     );
   }
 

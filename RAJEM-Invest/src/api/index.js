@@ -210,12 +210,13 @@ async function GetSingleWallet(carteiraID, userId) {
   return carteiraInfo;
 }
 
-async function saveNewActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao, cotacaoMomentoCompra, percentualDefinidoParaCarteira) {
+async function saveNewActionsOnWallet(userID, carteiraID, acaoID, setorAcao, quantidadeAcao, cotacaoMomentoCompra, percentualDefinidoParaCarteira) {
   const collection = await dataBaseCollectionConnection('carteiraAcoes');
   const carteiraAcao = {
     userID,
     carteiraID,
     acaoID,
+    setorAcao,
     quantidadeAcao,
     cotacaoMomentoCompra,
     percentualDefinidoParaCarteira

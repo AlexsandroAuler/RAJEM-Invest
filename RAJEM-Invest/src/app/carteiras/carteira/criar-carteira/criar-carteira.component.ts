@@ -16,10 +16,9 @@ export class CriarCarteiraComponent {
   nomeCarteira: string = '';
   username : string = '';
   password: string = '';
-  valorInvestimento: number = 0;
   podeCriarCarteira: boolean = false;
 
-  linhas: { idAcao: string; percentual: number; cotacaoAtual: number; quantidade: number }[] = [];
+  linhas: { idAcao: string; setorAcao: string; percentual: number; cotacaoAtual: number; quantidade: number }[] = [];
 
   constructor(
     private authService: AuthService,
@@ -31,27 +30,26 @@ export class CriarCarteiraComponent {
   }
 
   //#region Criar Carteira
-  async adicionarCarteira(): Promise<void> {
+  async criarCarteira(): Promise<void> {
     try {
       if(!this.podeCriarCarteira)
         return alert("Você deve calcular as quantidades antes de poder criar a sua carteira.");
 
       const email = sessionStorage.getItem('email') as string;
       const nomeCarteira = (document.getElementById("nomeCarteira") as HTMLInputElement).value;
-      const valorInvestimento = Number((document.getElementById("valorInvestimento") as HTMLInputElement).value);
 
       let acoes = new Array<any>();
       //montar tabela de ações
       this.linhas.forEach(linha => {
         if (linha.percentual > 0) {
-          const acao = {"idAcao": linha.idAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": Number(linha.cotacaoAtual), "percentualOriginal": linha.percentual};
+          const acao = {"idAcao": linha.idAcao, "setorAcao": linha.setorAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": Number(linha.cotacaoAtual), "percentualOriginal": linha.percentual};
           acoes.push(acao);
         }
       });
       
       if (email && nomeCarteira && acoes) {
         // Faz a requisição para adicionar uma nova carteira
-        const response = await firstValueFrom(this.authService.adicionarCarteira(email, nomeCarteira, valorInvestimento, acoes));
+        const response = await firstValueFrom(this.authService.criarCarteira(email, nomeCarteira, acoes));
         
         if (response) { // Supondo que o backend retorna um campo `success` na resposta
           alert('Carteira Adicionada com sucesso!')
@@ -74,7 +72,7 @@ export class CriarCarteiraComponent {
   //#region Manipular Tabela
 
   adicionarLinha(): void {
-    this.linhas.push({ idAcao: '', percentual: 0, cotacaoAtual: 0, quantidade: 0 });
+    this.linhas.push({ idAcao: '', setorAcao: '', percentual: 0, cotacaoAtual: 0, quantidade: 0 });
   }
 
   removerLinha(index: number): void {
@@ -91,18 +89,17 @@ export class CriarCarteiraComponent {
     return false;
   }
   
-  async calcularTabela(): Promise<void> {
+  async consultarCotacoes(): Promise<void> {
+    this.podeCriarCarteira = false;
+
     if(!this.calcularSomatoriaPercentuais())
       alert('A somatória dos percentuais deve ser igual a 100%');
-    else if(this.valorInvestimento <= 0)
-      alert('O valor do investimento deve ser maior que 0 (zero)');
     else{
-      
       let acoes = new Array<any>();
 
       this.linhas.forEach(linha => {
         if (linha.percentual > 0) {
-          const acao = {"idAcao": linha.idAcao, "percentual": linha.percentual};
+          const acao = {"idAcao": linha.idAcao, "setorAcao": linha.setorAcao, "percentual": linha.percentual};
           acoes.push(acao);
         }
       });
@@ -111,7 +108,7 @@ export class CriarCarteiraComponent {
         return alert('Um ou mais IDs de ações foram informados incorretamente.');
       }
 
-      const response = await firstValueFrom(this.authService.calcularQuantidades(this.valorInvestimento, acoes));
+      const response = await firstValueFrom(this.authService.consultarCotacoes(acoes));
       this.ajustarTabela(response);
     }
   }
@@ -119,7 +116,7 @@ export class CriarCarteiraComponent {
   ajustarTabela(result: any): void{
     this.linhas.forEach(linha => {
       var acaoRetorno = result.result.find((x: any) => x.idAcao === linha.idAcao);
-      linha.quantidade = acaoRetorno.quantidade;
+      linha.setorAcao = acaoRetorno.setorAcao;
       linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
     });
 

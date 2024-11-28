@@ -51,18 +51,23 @@ export class AuthService {
   }
 
   // Novo método para Adicionar as carteiras
-  adicionarCarteira(email: string, nomeCarteira: string, valorInvestimento: number, acoes: Array<object>): Observable<{ success: boolean; error?: string }> {
+  criarCarteira(email: string, nomeCarteira: string, acoes: Array<object>): Observable<{ success: boolean; error?: string }> {
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/criar-carteira`, {
       email,
       nomeCarteira,
-      valorInvestimento,
       acoes
     });
   }
 
   calcularQuantidades(valorInicial: number, acoes: Array<object>){
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/validar-quantidade-acoes`, {
-      investimentoInicial: valorInicial ,
+      investimentoInicial: valorInicial,
+      acoes: acoes
+    });
+  }
+
+  consultarCotacoes(acoes: Array<object>){
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/consultar-cotacoes`, {
       acoes: acoes
     });
   }

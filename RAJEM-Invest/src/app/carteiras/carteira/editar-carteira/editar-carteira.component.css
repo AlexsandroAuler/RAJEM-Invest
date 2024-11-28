@@ -75,11 +75,45 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 600px;
+    width: 900px;
+  }
+
+  .secaoAporte {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 350px;
+  }
+
+  .voltar-carteira {
+    float:right;
+    margin: 20px 0px;
+    padding: 10px 20px;
+    background-color: rgb(235, 38, 38);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .button-carteira {
+    margin: 20px 20px 20px 0px;
+    padding: 10px 20px;
+    background-color: #2fafa1;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .create-carteira:hover {
+    background-color: #248f81;
   }
   
   h1, h2, h3, h4 {
-    color: #2fafa1;
     text-align: center;
     margin-bottom: 20px;
   }
@@ -104,22 +138,6 @@ body {
   
   .carteira-list li:last-child {
     border-bottom: none;
-  }
-  
-  .create-carteira {
-    display: block;
-    margin: 20px auto;
-    padding: 10px 20px;
-    background-color: #2fafa1;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .create-carteira:hover {
-    background-color: #248f81;
   }
 
   .tabela-carteira {
@@ -154,7 +172,7 @@ body {
 }
 
 /* Células da tabela */
-.tabela-carteira td {
+.tabela-carteira td input{
     padding: 10px;
     color: #555;
 }
@@ -168,4 +186,40 @@ body {
 .tabela-carteira .negativo {
     color: #F44336;
     font-weight: bold;
+}
+
+.inputsPadrao{
+  padding: 15px;
+  border: solid 1px #c0c0c0;
+  width: 200px;
+  border-radius: 5px;
+}
+
+th{
+  width: 100px;
+}
+
+td input{
+  width: 80px;
+}
+
+.tabela-acoes th{
+  color: #2fafa1;
+  text-align: center;
+  margin-bottom: 20px;
+  border-left: 1px solid;
+}
+
+.remover{
+  background-color: rgb(235, 38, 38);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;  
+}.remover{
+  background-color: rgb(235, 38, 38);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;  
 }

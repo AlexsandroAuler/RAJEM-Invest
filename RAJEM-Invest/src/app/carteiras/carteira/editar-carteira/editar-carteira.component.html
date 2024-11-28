@@ -7,37 +7,64 @@
                 <a href="#">Ações</a>
             </nav>
             <div class="profile">
-                <div class="avatar">{{ username ? username.charAt(0).toUpperCase() : 'U' }}</div> <!-- Primeira letra do username -->
-                <div class="username">{{ username || 'Nome investidor' }}</div> <!-- Mostra o username ou "Nome investidor" se não disponível -->
+                <div class="avatar">{{ username ? username.charAt(0).toUpperCase() : 'U' }}</div>
+                <div class="username">{{ username || 'Nome investidor' }}</div>
             </div>
         </div>
     </header>
-    <main>      
+    <main>
+        <section class="secaoAporte">
+            <h1>Realizar Aporte</h1>
+            <div class="carteira-list">
+                <ul>
+                    <li> 
+                        Valor de Investimento:
+                    </li>
+                    <li><input class="inputsPadrao" type="number" [(ngModel)]="valorInvestimento" id="valorInvestimento" min="0" 
+                        step="any" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190"
+                        placeholder="Digite o valor do investimento" oninput="this.value = this.value < 0 ? 0 : this.value">
+                    </li>
+                </ul>
+            </div>
+            <button class="button-carteira" (click)="calcularQuantidade()">Adicionar Saldo</button>
+            <button class="voltar-carteira" (click)="voltarCarteira()">Voltar</button>
+        </section>
         <section class="carteiras">
             <div class="scroll">
                 <h1>Carteira: {{carteiraInfo.carteira.nomeCarteira}}</h1>
                 <h3>Valor Total Alocado na Carteira: R$ {{carteiraInfo.carteira.valorInvestimento}}</h3>
-                <div class="carteira-list">
-                    <table class="tabela-carteira">
-                        <thead>
-                            <tr>
-                                <th>Ativo</th>
-                                <th>Quantidade</th>
-                                <th>Valor de Compra (R$)</th>
-                                <th>Participação Definida (%)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let acao of carteiraInfo.acoesCarteira">
-                                <td>{{ acao.acaoID }}</td>
-                                <td>{{ acao.quantidadeAcao }}</td>
-                                <td>{{ acao.cotacaoMomentoCompra }}</td>
-                                <td>{{ acao.percentualDefinidoParaCarteira }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="tabela-acoes">
+                    <thead>
+                        <tr>
+                            <th>Ativo</th>
+                            <th>Setor</th>
+                            <th>Quantidade</th>
+                            <th>Cotação Atual</th>
+                            <th>Patrimônio Atualizado</th>
+                            <th>Participação Atual (%)</th>
+                            <th>Objetivo</th>
+                            <th>Distância do Objetivo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let linha of linhas; let i = index">
+                            <td><input type="text" [(ngModel)]="linha.idAcao"></td>
+                            <td><input type="text" [(ngModel)]="linha.setorAcao" disabled></td>
+                            <td><input type="number" [(ngModel)]="linha.quantidade"></td>
+                            <td><input type="number" [(ngModel)]="linha.cotacaoAtual" disabled></td>
+                            <td><input type="number" [(ngModel)]="linha.patrimonioAtualizado"></td>
+                            <td><input type="number" [(ngModel)]="linha.participacaoAtual" disabled></td>
+                            <td><input type="number" [(ngModel)]="linha.objetivo"></td>
+                            <td><input type="number" [value]="linha.distanciaDoObjetivo" disabled></td>
+                            <td>
+                                <button class="remover" (click)="removerLinha(i)">Remover</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>                
             </div>
+            <button class="button-carteira" (click)="adicionarLinha()">Adicionar Nova Ação</button>
+            <button class="button-carteira" (click)="calcularTabela()">Consultar Cotações</button>
         </section>
     </main>  
 </body>

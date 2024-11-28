@@ -21,13 +21,9 @@
                         Nome da carteira:
                     </li>
                     <li><input class="inputsPadrao" type="text" id="nomeCarteira" placeholder="Digite aqui o nome da carteira"></li>
-                    <li> 
-                        Valor de Investimento:
-                    </li>
-                    <li><input class="inputsPadrao" type="number" id="valorInvestimento" [(ngModel)]="valorInvestimento"  placeholder="Digite o valor do investimento"></li>
                 </ul>
             </div> 
-            <button class="create-carteira" (click)="adicionarCarteira()">Adicionar carteira</button>
+            <button class="create-carteira" (click)="criarCarteira()">Adicionar carteira</button>
             <button class="voltar-carteira" (click)="voltarCarteira()">Voltar</button>
         </section>
         
@@ -38,7 +34,6 @@
                         <th>ID Ação</th>
                         <th>Percentual</th>
                         <th>Cotação Atual</th>
-                        <th>Quantidade</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -47,7 +42,6 @@
                         <td><input type="text" [(ngModel)]="linha.idAcao"></td>
                         <td><input type="number" [(ngModel)]="linha.percentual"></td>
                         <td><input type="number" [value]="linha.cotacaoAtual" disabled></td>
-                        <td><input type="number" [value]="linha.quantidade" disabled></td>
                         <td>
                             <button class="remover" (click)="removerLinha(i)">Remover</button>
                         </td>
@@ -55,7 +49,7 @@
                 </tbody>
             </table>
             <button class="buttonTabela" (click)="adicionarLinha()">Adicionar Ação</button>
-            <button class="buttonTabela" (click)="calcularTabela()">Calcular Quantidades</button>
+            <button class="buttonTabela" (click)="consultarCotacoes()">Consultar Cotação</button>
         </section> 
     </main>  
 </body>

@@ -3,7 +3,8 @@ const cors = require('cors');
 const { generateUniqueToken, validateToken, salvarUsuarioBanco, 
   login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, 
   saveNewWallet, GetListWallets, GetSingleWallet, saveNewActionsOnWallet, 
-  removeActionsOnWallet, getWalletIdByName, getSpecificAction } = require('./index');
+  removeActionsOnWallet, getWalletIdByName, getSpecificAction, 
+  addBallanceToWallet } = require('./index');
 
 const app = express();
 
@@ -236,7 +237,7 @@ app.post('/criar-carteira', async(req, res) => {
       acao.setorAcao,
       0,
       0,
-      0
+      acao.percentualOriginal
     );
   }
 
@@ -326,6 +327,22 @@ app.post('/remover-acao-carteira', async(req, res) => {
   }catch(error){
     console.error('Erro ao remover ações:', error);
     res.status(500).json({ error: 'Erro interno ao remover ações.' });
+  }
+});
+
+app.post('/adicionar-saldo-carteira', async(req, res) => {
+  const { email, carteiraId, saldo} = req.body;
+  const userId = await getUserIdByEmail(email);
+
+  if(userId == null){
+    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
+  }
+  try{
+    result = await addBallanceToWallet(userId.toString(), carteiraId.toString(), saldo);
+    return res.status(200).json({ success: true, novoSaldo : result });
+  }catch(error){
+    console.error('Erro ao remover ações:', error);
+    res.status(500).json({ success: false, error: 'Erro interno.' });
   }
 });
 

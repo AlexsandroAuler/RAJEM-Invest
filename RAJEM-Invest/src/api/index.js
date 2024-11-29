@@ -201,7 +201,6 @@ async function GetSingleWallet(carteiraID, userId) {
   const queryAcoesCarteira = { carteiraID: carteiraID};
   const acoesCarteira = await collectionAcoesCarteira.find(queryAcoesCarteira).toArray();
 
-
   const carteiraInfo = {
     carteira: resultCarteira,
     acoesCarteira: acoesCarteira
@@ -261,6 +260,24 @@ async function removeActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcaoR
   }
 
   return true;
+}
+
+async function addBallanceToWallet(userId, carteiraID, saldo) {
+  const collectionCarteira = await dataBaseCollectionConnection('carteiras');
+
+  const queryCarteira = {
+    _id: new ObjectId(carteiraID),
+    usuarioID: userId
+  };
+
+  const update = {
+    $inc: { valorInvestimento: + saldo }
+  };
+  const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+
+  const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
+  console.log(result.valorInvestimento);
+  return result.valorInvestimento
 }
 
 async function validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
@@ -326,5 +343,6 @@ module.exports = {
   GetSingleWallet,
   saveNewActionsOnWallet,
   removeActionsOnWallet,
-  getWalletIdByName
+  getWalletIdByName,
+  addBallanceToWallet
 };

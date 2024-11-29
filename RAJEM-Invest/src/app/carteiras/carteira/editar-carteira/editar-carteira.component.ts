@@ -4,7 +4,7 @@ import { AuthService } from '../../../services/auth.service';
 import { firstValueFrom} from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { FormsModule } from '@angular/forms'; 
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-editar-carteira',
@@ -16,10 +16,10 @@ import { FormsModule } from '@angular/forms';
 export class EditarCarteiraComponent {
   username : string = '';
   valorInvestimento: number = 0;
+  
   linhas: { idAcao: string; setorAcao: string; objetivo: number;
     cotacaoAtual: number; quantidade: number, patrimonioAtualizado: number, 
     participacaoAtual: number, distanciaDoObjetivo: number}[] = [];
-    podeCriarCarteira: boolean = false;
 
   carteiraInfo: { carteira: any; acoesCarteira: Array<any> } = {
     carteira: null,
@@ -58,8 +58,18 @@ export class EditarCarteiraComponent {
     }
   }
 
-  async calcularQuantidade(): Promise<void>{
+  async adicionarSaldoCarteira(): Promise<void>{
+    const carteiraId = this.route.snapshot.paramMap.get('id');
+    const saldo = this.valorInvestimento;
 
+    if(carteiraId && saldo){
+      const response = await firstValueFrom(this.authService.adicionarSaldoCarteira(this.username, carteiraId, Number(saldo)));
+      debugger;
+      if(response.success){
+        this.carteiraInfo.carteira.valorInvestimento = response.novoSaldo;
+        this.valorInvestimento = 0;
+      }
+    }
   }
 
   async adicionarAcao(): Promise<void>{
@@ -92,8 +102,6 @@ export class EditarCarteiraComponent {
   }
 
   async calcularTabela(): Promise<void> {
-    this.podeCriarCarteira = false;
-
     if(!this.calcularSomatoriaPercentuais())
       alert('A somatória dos percentuais deve ser igual a 100%');
     else{
@@ -132,8 +140,6 @@ export class EditarCarteiraComponent {
       var acaoRetorno = result.result.find((x: any) => x.idAcao === linha.idAcao);
       linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
     });
-
-    this.podeCriarCarteira = true;
   }
 
   voltarCarteira(): void{

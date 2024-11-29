@@ -59,6 +59,14 @@ export class AuthService {
     });
   }
 
+  adicionarSaldoCarteira(email: string, carteiraId: string, saldo: number): Observable<{ success: boolean; error?: string, novoSaldo?: number }> {
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/adicionar-saldo-carteira`, {
+      email,
+      carteiraId,
+      saldo
+    });
+  }
+
   calcularQuantidades(valorInicial: number, acoes: Array<object>){
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/validar-quantidade-acoes`, {
       investimentoInicial: valorInicial,

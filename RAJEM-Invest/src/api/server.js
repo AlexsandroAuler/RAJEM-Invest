@@ -4,7 +4,7 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco,
   login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, 
   saveNewWallet, GetListWallets, GetSingleWallet, saveNewActionsOnWallet, 
   removeActionsOnWallet, getWalletIdByName, getSpecificAction, 
-  addBallanceToWallet } = require('./index');
+  addBallanceToWallet, updateWallet } = require('./index');
 
 const app = express();
 
@@ -25,7 +25,7 @@ app.use(express.json()); // Para lidar com JSON no corpo das requisições
 const hostname = '127.0.0.1';
 const port = 3000;
 
-//#region Rotas
+//#region Rotas Usuário
 
 // Rota para lidar com a criação de token
 app.get('/teste', async(req, res) => {
@@ -167,54 +167,9 @@ app.post('/validar-token', async(req, res) => {
   }
 });
 
-app.post('/validar-quantidade-acoes', async(req, res) => {
-  const { investimentoInicial, acoes  } = req.body;
-  let retorno = [];
+//#endregion
 
-  for (const acao of acoes) {
-    const valorTotalAcao = Number(investimentoInicial * (acao.percentual / 100));
-
-    const detalhesAcao = await getSpecificAction(acao.idAcao);
-
-    const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
-    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
-    const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
-
-    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
-
-    let acaoRetorno = {
-      idAcao: acao.idAcao,
-      percentual: acao.percentual,
-      quantidade: quantidadeDeAcoes,
-      cotacaoAtual: valorAcao
-    };
-    retorno.push(acaoRetorno);
-  }
-
-  res.status(200).json({ result: retorno });
-});
-
-app.post('/consultar-cotacoes', async(req, res) => {
-  const { acoes  } = req.body;
-  let retorno = [];
-
-  for (const acao of acoes) {
-    const detalhesAcao = await getSpecificAction(acao.idAcao);
-    const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
-    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
-    const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
-
-    let acaoRetorno = {
-      idAcao: acao.idAcao,
-      setorAcao: detalhesAcao[0].sector,
-      cotacaoAtual: valorAcao
-    };
-
-    retorno.push(acaoRetorno);
-  }
-
-  res.status(200).json({ result: retorno });
-});
+//#region Carteira
 
 app.post('/criar-carteira', async(req, res) => {
   const { email, nomeCarteira, valorInvestimento, acoes } = req.body;
@@ -233,7 +188,7 @@ app.post('/criar-carteira', async(req, res) => {
     await saveNewActionsOnWallet(
       userIdByEmail.toString(),
       idCarteira.toString(),
-      acao.idAcao,
+      acao.acaoID,
       acao.setorAcao,
       0,
       0,
@@ -242,19 +197,6 @@ app.post('/criar-carteira', async(req, res) => {
   }
 
   res.status(200).json({ result: idCarteira });
-});
-
-app.get('/listar-carteiras', async(req, res) => {
-  const { email } = req.query;
-  const userIdByEmail = await getUserIdByEmail(email);
-  
-  if(userIdByEmail == null){
-    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
-  }
-
-  result = await GetListWallets(userIdByEmail.toString());
-
-  return res.status(200).json({ result : result });
 });
 
 app.get('/get-carteira', async(req, res) => {
@@ -273,61 +215,17 @@ app.get('/get-carteira', async(req, res) => {
   return res.status(200).json({ result : result });
 });
 
-app.get('/get-all-actions', async(req, res) => {
-
-  result = await getAllActions();
-
-  return res.status(200).json({ result : result });
-});
-
-app.get('/get-specific-action', async(req, res) => {
-  const { idAcao } = req.query;
-  try{
-    result = await getSpecificAction(idAcao);
-    return res.status(200).json({ result : result });
-  }catch{
-    return res.status(400).json({ error : 'Ocorreu um erro ao buscar pelo ID da ação' });
-  }
- 
-});
-
-app.get('/get-all-actions-names', async(req, res) => {
-  result = await getAllActions();
-  names = result.stocks.map(stock => stock.stock);
-
-  return res.status(200).json({ result : names });
-});
-
-app.post('/adicionar-acao-carteira', async(req, res) => {
-  const { email, nomeCarteira, idAcao, quantidadeAcao} = req.body;
-
-  const userId = await getUserIdByEmail(email);
-  const carteiraId = await getWalletIdByName(nomeCarteira);
-
-  if(userId == null || carteiraId == null || quantidadeAcao <= 0){
-    return res.status(400).json({ error: 'Ocorreu um erro com os dados enviado, por fazer revisar os seguintes dados => Email: ' +  email + " | Nome carteira: " + nomeCarteira + " | Quantidade Acoes: " + quantidadeAcao});
-  }
-
-  result = await saveNewActionsOnWallet(userId.toString(), carteiraId.toString(), idAcao, quantidadeAcao);
-
-  return res.status(200).json({ result : result });
-});
-
-app.post('/remover-acao-carteira', async(req, res) => {
-  const { email, nomeCarteira, idAcao, quantidadeAcao} = req.body;
-  const userId = await getUserIdByEmail(email);
-  const carteiraId = await getWalletIdByName(nomeCarteira);
-
-  if(userId == null){
+app.get('/listar-carteiras', async(req, res) => {
+  const { email } = req.query;
+  const userIdByEmail = await getUserIdByEmail(email);
+  
+  if(userIdByEmail == null){
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
   }
-  try{
-    result = await removeActionsOnWallet(userId.toString(), carteiraId.toString(), idAcao, quantidadeAcao);
-    return res.status(200).json({ result : true });
-  }catch(error){
-    console.error('Erro ao remover ações:', error);
-    res.status(500).json({ error: 'Erro interno ao remover ações.' });
-  }
+
+  result = await GetListWallets(userIdByEmail.toString());
+
+  return res.status(200).json({ result : result });
 });
 
 app.post('/adicionar-saldo-carteira', async(req, res) => {
@@ -343,6 +241,128 @@ app.post('/adicionar-saldo-carteira', async(req, res) => {
   }catch(error){
     console.error('Erro ao remover ações:', error);
     res.status(500).json({ success: false, error: 'Erro interno.' });
+  }
+});
+
+//#endregion
+
+//#region Ações/Ativos
+
+app.post('/validar-quantidade-acoes', async(req, res) => {
+  const { investimentoInicial, acoes  } = req.body;
+  let retorno = [];
+
+  for (const acao of acoes) {
+    const valorTotalAcao = Number(investimentoInicial * (acao.percentualDefinidoParaCarteira / 100));
+    const detalhesAcao = await getSpecificAction(acao.acaoID);
+    const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
+    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
+    const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
+    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+
+    let acaoRetorno = {
+      acaoID: acao.acaoID,
+      percentual: acao.percentual,
+      quantidade: quantidadeDeAcoes,
+      cotacaoAtual: valorAcao
+    };
+    retorno.push(acaoRetorno);
+  }
+
+  res.status(200).json({ result: retorno });
+});
+
+app.post('/consultar-cotacoes', async(req, res) => {
+  const { acoes } = req.body;
+  console.log(acoes);
+  let retorno = [];
+
+  for (const acao of acoes) {
+    const detalhesAcao = await getSpecificAction(acao.acaoID);
+    const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
+    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
+    const valorAcao = parseFloat((valorFechamentoAcao + valorVariacaoAcao).toFixed(2));
+
+    let acaoRetorno = {
+      acaoID: acao.acaoID,
+      setorAcao: detalhesAcao[0].sector,
+      cotacaoAtual: valorAcao
+    };
+
+    retorno.push(acaoRetorno);
+  }
+
+  res.status(200).json({ result: retorno });
+});
+
+app.get('/get-all-actions', async(req, res) => {
+
+  result = await getAllActions();
+
+  return res.status(200).json({ result : result });
+});
+
+app.get('/get-specific-action', async(req, res) => {
+  const { acaoID } = req.query;
+  try{
+    result = await getSpecificAction(acaoID);
+    return res.status(200).json({ result : result });
+  }catch{
+    return res.status(400).json({ error : 'Ocorreu um erro ao buscar pelo ID da ação' });
+  }
+ 
+});
+
+app.get('/get-all-actions-names', async(req, res) => {
+  result = await getAllActions();
+  names = result.stocks.map(stock => stock.stock);
+
+  return res.status(200).json({ result : names });
+});
+
+app.post('/adicionar-acao-carteira', async(req, res) => {
+  const { email, nomeCarteira, acaoID, quantidadeAcao} = req.body;
+
+  const userId = await getUserIdByEmail(email);
+  const carteiraId = await getWalletIdByName(nomeCarteira);
+
+  if(userId == null || carteiraId == null || quantidadeAcao <= 0){
+    return res.status(400).json({ error: 'Ocorreu um erro com os dados enviado, por fazer revisar os seguintes dados => Email: ' +  email + " | Nome carteira: " + nomeCarteira + " | Quantidade Acoes: " + quantidadeAcao});
+  }
+
+  result = await saveNewActionsOnWallet(userId.toString(), carteiraId.toString(), acaoID, quantidadeAcao);
+
+  return res.status(200).json({ result : result });
+});
+
+app.post('/salvar-carteira', async(req, res) => {
+  const { email, carteiraInfo} = req.body;
+
+  const userId = await getUserIdByEmail(email);
+
+  if(userId == null || carteiraInfo == null ){
+    return res.status(400).json({ error: 'Ocorreu um erro com os dados enviado, por fazer revisar os seguintes dados => Email: ' +  email + " | Carteira: " + carteiraInfo });
+  }
+
+  result = await updateWallet(userId.toString(), carteiraInfo);
+
+  return res.status(200).json({ result : result });
+});
+
+app.post('/remover-acao-carteira', async(req, res) => {
+  const { email, nomeCarteira, acaoID, quantidadeAcao} = req.body;
+  const userId = await getUserIdByEmail(email);
+  const carteiraId = await getWalletIdByName(nomeCarteira);
+
+  if(userId == null){
+    return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });
+  }
+  try{
+    result = await removeActionsOnWallet(userId.toString(), carteiraId.toString(), acaoID, quantidadeAcao);
+    return res.status(200).json({ result : true });
+  }catch(error){
+    console.error('Erro ao remover ações:', error);
+    res.status(500).json({ error: 'Erro interno ao remover ações.' });
   }
 });
 

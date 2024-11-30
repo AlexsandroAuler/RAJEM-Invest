@@ -109,11 +109,11 @@ export class CriarCarteiraComponent {
       }
 
       const response = await firstValueFrom(this.authService.consultarCotacoes(acoes));
-      this.ajustarTabela(response);
+      this.ajustarCotacaoTabela(response);
     }
   }
   
-  ajustarTabela(result: any): void{
+  ajustarCotacaoTabela(result: any): void{
     this.linhas.forEach(linha => {
       var acaoRetorno = result.result.find((x: any) => x.idAcao === linha.idAcao);
       linha.setorAcao = acaoRetorno.setorAcao;

@@ -31,8 +31,8 @@
         </section>
         <section class="carteiras">
             <div class="scroll">
-                <h1>Carteira: {{carteiraInfo.carteira.nomeCarteira}}</h1>
-                <h3>Valor Total Alocado na Carteira: R$ {{carteiraInfo.carteira.valorInvestimento}}</h3>
+                <h1>Carteira: {{carteiraInfo.carteira?.nomeCarteira ?? ""}}</h1>
+                <h3>Valor Total Alocado na Carteira: R$ {{carteiraInfo.carteira?.valorInvestimento ?? ""}}</h3>
                 <table class="tabela-acoes">
                     <thead>
                         <tr>
@@ -43,12 +43,12 @@
                             <th>Patrimônio Atualizado</th>
                             <th>Participação Atual (%)</th>
                             <th>Objetivo (%)</th>
-                            <th>Distância do Objetivo</th>
+                            <th>Distância do Objetivo (%)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let linha of linhas; let i = index">
-                            <td><input type="text" [(ngModel)]="linha.idAcao"></td>
+                            <td><input type="text" [(ngModel)]="linha.acaoID"></td>
                             <td><input type="text" [(ngModel)]="linha.setorAcao" disabled></td>
                             <td><input type="number" [(ngModel)]="linha.quantidade"></td>
                             <td><input type="number" [(ngModel)]="linha.cotacaoAtual" disabled></td>
@@ -56,15 +56,18 @@
                             <td><input type="number" [(ngModel)]="linha.participacaoAtual" disabled></td>
                             <td><input type="number" [(ngModel)]="linha.objetivo"></td>
                             <td><input type="number" [value]="linha.distanciaDoObjetivo" disabled></td>
-                            <td>
+                            <!-- <td>
                                 <button class="remover" (click)="removerLinha(i)">Remover</button>
-                            </td>
+                            </td> -->
                         </tr>
                     </tbody>
                 </table>                
             </div>
             <button class="button-carteira" (click)="adicionarLinha()">Adicionar Nova Ação</button>
             <button class="button-carteira" (click)="calcularTabela()">Consultar Cotações</button>
+            <button class="button-carteira" (click)="sugerirCompra()" *ngIf="primeiraCompra">Sugerir Compra</button>
+            <button class="button-carteira" (click)="rebalancoCarteira()" *ngIf="!primeiraCompra">Rebalancear</button>
+            <button class="button-carteira" (click)="salvarCarteira()">Salvar Carteira</button>
         </section>
     </main>  
 </body>

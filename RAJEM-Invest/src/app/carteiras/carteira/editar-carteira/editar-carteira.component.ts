@@ -16,8 +16,11 @@ import { FormsModule } from '@angular/forms';
 export class EditarCarteiraComponent {
   username : string = '';
   valorInvestimento: number = 0;
+  primeiraCompra: boolean = true;
+  mensagemErro = '';
+  cotacoesAtualizadas = new Array<any>;
   
-  linhas: { idAcao: string; setorAcao: string; objetivo: number;
+  linhas: { acaoID: string; setorAcao: string; objetivo: number;
     cotacaoAtual: number; quantidade: number, patrimonioAtualizado: number, 
     participacaoAtual: number, distanciaDoObjetivo: number}[] = [];
 
@@ -38,24 +41,45 @@ export class EditarCarteiraComponent {
     
     if (idCarteira) {
       await this.carregarDadosCarteira(idCarteira);
+      this.ajustarCotacaoTabela(this.cotacoesAtualizadas);
     }
+    
   }
 
   async carregarDadosCarteira(carteiraId: string): Promise<void> {
     try {
       if(this.username){}
         const response = await firstValueFrom(this.authService.getCarteira(this.username, carteiraId));
-      this.carteiraInfo = response.result;
-      this.carteiraInfo.acoesCarteira.forEach(acao => {
-        const patrimonioAcao = acao.cotacaoMomentoCompra * acao.quantidadeAcao;
-        const distanciaObjetivo = acao.percentualDefinidoParaCarteira - 0;
 
-        this.adicionarLinhaAcao(acao.acaoID, acao.setorAcao, 0, acao.quantidadeAcao, patrimonioAcao, 0, acao.percentualDefinidoParaCarteira, 0);
+      this.carteiraInfo = response.result;
+      this.primeiraCompra = this.carteiraInfo.carteira.primeiraCompra;
+
+      this.cotacoesAtualizadas = (await firstValueFrom(this.authService.consultarCotacoes(this.carteiraInfo.acoesCarteira))).result;
+      const valorTotalCarteira = this.calcularValorTotal(this.carteiraInfo.acoesCarteira, this.cotacoesAtualizadas);
+
+      this.carteiraInfo.acoesCarteira.forEach(acao => {
+        const valorAtualizadoCotacao = this.cotacoesAtualizadas.find((x: any) => x.acaoID === acao.acaoID).cotacaoAtual;
+        const patrimonioAcao = Number((valorAtualizadoCotacao * acao.quantidadeAcao).toFixed(2));
+        const participacaoAtual = Number(((patrimonioAcao * 100) / valorTotalCarteira ).toFixed(2))
+        const distanciaObjetivo = Number((participacaoAtual - acao.percentualDefinidoParaCarteira).toFixed(2));
+
+        this.adicionarLinhaAcao(acao.acaoID, acao.setorAcao, 0, acao.quantidadeAcao, patrimonioAcao, participacaoAtual, acao.percentualDefinidoParaCarteira, distanciaObjetivo);
       });
 
     } catch (erro) {
       console.error('Erro ao carregar carteiras:', erro);
     }
+  }
+
+   calcularValorTotal(listaA: Array<any>, listaB: Array<any>): number {
+    return listaA.reduce((total, acaoA) => {
+      const acaoB = listaB.find(acao => acao.acaoID === acaoA.acaoID);
+  
+      if (acaoB) {
+        total += acaoA.quantidadeAcao * acaoB.cotacaoAtual;
+      }
+      return Number(total.toFixed(2));
+    }, 0);
   }
 
   async adicionarSaldoCarteira(): Promise<void>{
@@ -64,7 +88,7 @@ export class EditarCarteiraComponent {
 
     if(carteiraId && saldo){
       const response = await firstValueFrom(this.authService.adicionarSaldoCarteira(this.username, carteiraId, Number(saldo)));
-      debugger;
+
       if(response.success){
         this.carteiraInfo.carteira.valorInvestimento = response.novoSaldo;
         this.valorInvestimento = 0;
@@ -77,18 +101,132 @@ export class EditarCarteiraComponent {
   }
 
   adicionarLinha(): void {
-    this.linhas.push({ idAcao: '', setorAcao: '', objetivo: 0, cotacaoAtual: 0, quantidade: 0, patrimonioAtualizado: 0, participacaoAtual: 0, distanciaDoObjetivo: 0 });
+    this.linhas.push({ acaoID: '', setorAcao: '', objetivo: 0, cotacaoAtual: 0, quantidade: 0, patrimonioAtualizado: 0, participacaoAtual: 0, distanciaDoObjetivo: 0 });
   }
 
-  adicionarLinhaAcao(idAcao: string, setorAcao: string, 
+  adicionarLinhaAcao(acaoID: string, setorAcao: string, 
     cotacaoAtual: number, quantidade: number, patrimonioAtualizado: number, 
     participacaoAtual: number, objetivo: number, distanciaDoObjetivo: number)
     : void{
-      this.linhas.push({ idAcao, setorAcao, quantidade, cotacaoAtual, patrimonioAtualizado, participacaoAtual, objetivo,distanciaDoObjetivo });
+      this.linhas.push({ acaoID, setorAcao, quantidade, cotacaoAtual, patrimonioAtualizado, participacaoAtual, objetivo,distanciaDoObjetivo });
   }
 
   removerLinha(index: number): void {
     this.linhas.splice(index, 1);
+  }
+
+  async calcularTabela(): Promise<void> {
+    if(await this.validar()){
+      this.alertar();
+    }
+
+    else{
+      let acoes = new Array<any>();
+      this.linhas.forEach(linha => {
+        if (linha.objetivo > 0) {
+          const acao = {"acaoID": linha.acaoID, "percentual": linha.objetivo};
+          acoes.push(acao);
+        }
+      });
+
+      const response = await firstValueFrom(this.authService.consultarCotacoes(acoes));
+      this.ajustarCotacaoTabela(response.result);
+    }
+  }
+
+  async validarIdsAcoesTabela(acoes: Array<any>): Promise<boolean>{
+    const nomesAcoes = await firstValueFrom(this.authService.consultarIdsAcoes());
+    let acaoIncorreta = false;
+    acoes.forEach(acao => {
+      if(!nomesAcoes.result.includes(acao.acaoID)){
+        acaoIncorreta = true;
+      }
+    });
+
+    return acaoIncorreta;
+  }
+
+  ajustarCotacaoTabela(result: any): void{
+    this.linhas.forEach(linha => {
+      var acaoRetorno = result.find((x: any) => x.acaoID === linha.acaoID);
+      linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
+    });
+  }
+
+  voltarCarteira(): void{
+    this.router.navigate(['/listar-carteira']);
+  }
+
+  async sugerirCompra(): Promise<void>{
+    if(await this.validar()){
+      this.alertar();
+    }
+    else{
+      const result = await firstValueFrom(this.authService.calcularQuantidades(this.carteiraInfo.carteira.valorInvestimento, this.carteiraInfo.acoesCarteira));
+      if(!result)
+        alert('Ocorreu um erro inesperado, por favor tente novamente.');
+      else
+        this.aplicarSugestaoTabela(result);
+    }
+  }
+
+  async rebalancoCarteira(): Promise<void>{
+
+  }
+
+  async salvarCarteira(): Promise<void>{
+    if (this.username && this.carteiraInfo.carteira && this.carteiraInfo.acoesCarteira) {
+      // Faz a requisição para adicionar uma nova carteira
+      debugger;
+      //salvar as cotacoes e quantidades antes de enviar pra salvar
+      this.ajustarValoresCarteira();
+      const response = await firstValueFrom(this.authService.salvarCarteira(this.username, this.carteiraInfo));
+      
+      if (response) { // Supondo que o backend retorna um campo `success` na resposta
+        alert('Carteira salva com sucesso!')
+        sessionStorage.setItem('email', this.username);
+        this.router.navigate(['/listar-carteira']);
+      } else {
+        console.error('Erro ao adicionar carteira:');
+      }
+    } else {
+      console.error('Informações pendentes');
+    }
+  }
+
+  aplicarSugestaoTabela(result: any): void{
+    this.linhas.forEach(linha => {
+      var acaoRetorno = result.result.find((x: any) => x.acaoID === linha.acaoID);
+      linha.quantidade = acaoRetorno.quantidade;
+    });
+  }
+
+  async validar(): Promise<boolean>{
+    if(!this.calcularSomatoriaPercentuais()){
+      this.mensagemErro = 'A somatória dos percentuais deve ser igual a 100%';
+      return true;
+    }
+
+    if(await this.validarIdsAcoesTabela(this.carteiraInfo.acoesCarteira)){
+       this.mensagemErro = 'Um ou mais IDs de ações foram informados incorretamente.';
+       return true;
+    }
+
+    return false;
+  }
+
+  ajustarValoresCarteira(): void{
+    this.linhas.forEach(linha => {
+      var acao = this.carteiraInfo.acoesCarteira.find((x: any) => x.acaoID === linha.acaoID);
+      acao.quantidadeAcao = linha.quantidade;
+      acao.cotacaoMomentoCompra = Number(linha.cotacaoAtual);
+      acao.percentualDefinidoParaCarteira = linha.objetivo;
+    });
+  }
+
+  alertar(){
+    alert(this.mensagemErro);
+    this.mensagemErro = '';
   }
 
   calcularSomatoriaPercentuais(): boolean{
@@ -99,50 +237,5 @@ export class EditarCarteiraComponent {
       return true;
     else
     return false;
-  }
-
-  async calcularTabela(): Promise<void> {
-    if(!this.calcularSomatoriaPercentuais())
-      alert('A somatória dos percentuais deve ser igual a 100%');
-    else{
-      let acoes = new Array<any>();
-
-      this.linhas.forEach(linha => {
-        if (linha.objetivo > 0) {
-          const acao = {"idAcao": linha.idAcao, "percentual": linha.objetivo};
-          acoes.push(acao);
-        }
-      });
-
-      if(await this.validarIdsAcoesTabela(acoes)){
-        return alert('Um ou mais IDs de ações foram informados incorretamente.');
-      }
-
-      const response = await firstValueFrom(this.authService.consultarCotacoes(acoes));
-      this.ajustarTabela(response);
-    }
-  }
-
-  async validarIdsAcoesTabela(acoes: Array<any>): Promise<boolean>{
-    const nomesAcoes = await firstValueFrom(this.authService.consultarIdsAcoes());
-    let acaoIncorreta = false;
-    acoes.forEach(acao => {
-      if(!nomesAcoes.result.includes(acao.idAcao)){
-        acaoIncorreta = true;
-      }
-    });
-
-    return acaoIncorreta;
-  }
-
-  ajustarTabela(result: any): void{
-    this.linhas.forEach(linha => {
-      var acaoRetorno = result.result.find((x: any) => x.idAcao === linha.idAcao);
-      linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
-    });
-  }
-
-  voltarCarteira(): void{
-    this.router.navigate(['/listar-carteira']);
   }
 }

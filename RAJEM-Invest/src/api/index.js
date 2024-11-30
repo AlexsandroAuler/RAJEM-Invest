@@ -173,7 +173,8 @@ async function saveNewWallet(usuarioID, nomeCarteira, valorInvestimento) {
   const newWallet = {
     usuarioID,
     nomeCarteira,
-    valorInvestimento
+    valorInvestimento,
+    primeiraCompra: true //caso esteja false libera o rebalanço da carteira
   };
 
   const result = await collection.insertOne(newWallet);
@@ -238,6 +239,47 @@ async function saveNewActionsOnWallet(userID, carteiraID, acaoID, setorAcao, qua
     const result = await collection.updateOne(filtro, update);
     return wallet._id;
   }
+}
+
+async function updateWallet(userId, carteiraInfo) {
+  //atualizar ações da carteira
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+
+  for (const acao of carteiraInfo.acoesCarteira){
+  
+    const queryCarteiraAcao = {
+      _id: new ObjectId(acao._id),
+      userID: acao.userID,
+      carteiraID: acao.carteiraID
+    };
+  
+    const update = {
+      $set: { 
+        quantidadeAcao: acao.quantidadeAcao,
+        cotacaoMomentoCompra: acao.cotacaoMomentoCompra,
+        percentualDefinidoParaCarteira: acao.percentualDefinidoParaCarteira
+      }
+    };
+  
+    await collection.updateOne(queryCarteiraAcao, update);
+  }
+
+  //atualizar carteira
+  const collectionCarteira = await dataBaseCollectionConnection('carteiras');
+  const queryCarteira = {
+    _id: new ObjectId(carteiraInfo.carteira._id),
+    usuarioID: userId
+  };
+
+  const update = {
+    $set: { primeiraCompra: false }
+  };
+
+  const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+  const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
+
+  console.log(result);
+  return result;
 }
 
 async function removeActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcaoRemover) {
@@ -344,5 +386,6 @@ module.exports = {
   saveNewActionsOnWallet,
   removeActionsOnWallet,
   getWalletIdByName,
-  addBallanceToWallet
+  addBallanceToWallet,
+  updateWallet
 };

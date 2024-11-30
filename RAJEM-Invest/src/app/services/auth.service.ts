@@ -75,13 +75,20 @@ export class AuthService {
   }
 
   consultarCotacoes(acoes: Array<object>){
-    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/consultar-cotacoes`, {
+    return this.http.post<{ success: boolean; error?: string, result: Array<any>}>(`${this.apiUrl}/consultar-cotacoes`, {
       acoes: acoes
     });
   }
 
   consultarIdsAcoes(): Observable<{ result: Array<string> }> {
     return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-all-actions-names`, {});
+  }
+
+  salvarCarteira(email: string, carteiraInfo : any): Observable<{ success: boolean; error?: string, result?: any }>{
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/salvar-carteira`, {
+      email,
+      carteiraInfo
+    });
   }
 
 }

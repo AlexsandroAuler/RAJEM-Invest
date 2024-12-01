@@ -39,7 +39,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let linha of linhas; let i = index">
-                        <td><input type="text" [(ngModel)]="linha.idAcao"></td>
+                        <td><input type="text" [(ngModel)]="linha.acaoID"></td>
                         <td><input type="number" [(ngModel)]="linha.percentual"></td>
                         <td><input type="number" [value]="linha.cotacaoAtual" disabled></td>
                         <td>

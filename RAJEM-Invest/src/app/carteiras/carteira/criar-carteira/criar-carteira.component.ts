@@ -18,7 +18,7 @@ export class CriarCarteiraComponent {
   password: string = '';
   podeCriarCarteira: boolean = false;
 
-  linhas: { idAcao: string; setorAcao: string; percentual: number; cotacaoAtual: number; quantidade: number }[] = [];
+  linhas: { acaoID: string; setorAcao: string; percentual: number; cotacaoAtual: number; quantidade: number }[] = [];
 
   constructor(
     private authService: AuthService,
@@ -42,7 +42,7 @@ export class CriarCarteiraComponent {
       //montar tabela de ações
       this.linhas.forEach(linha => {
         if (linha.percentual > 0) {
-          const acao = {"idAcao": linha.idAcao, "setorAcao": linha.setorAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": Number(linha.cotacaoAtual), "percentualOriginal": linha.percentual};
+          const acao = {"acaoID": linha.acaoID, "setorAcao": linha.setorAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": Number(linha.cotacaoAtual), "percentualOriginal": linha.percentual};
           acoes.push(acao);
         }
       });
@@ -72,7 +72,7 @@ export class CriarCarteiraComponent {
   //#region Manipular Tabela
 
   adicionarLinha(): void {
-    this.linhas.push({ idAcao: '', setorAcao: '', percentual: 0, cotacaoAtual: 0, quantidade: 0 });
+    this.linhas.push({ acaoID: '', setorAcao: '', percentual: 0, cotacaoAtual: 0, quantidade: 0 });
   }
 
   removerLinha(index: number): void {
@@ -99,7 +99,7 @@ export class CriarCarteiraComponent {
 
       this.linhas.forEach(linha => {
         if (linha.percentual > 0) {
-          const acao = {"idAcao": linha.idAcao, "setorAcao": linha.setorAcao, "percentual": linha.percentual};
+          const acao = {"acaoID": linha.acaoID, "setorAcao": linha.setorAcao, "percentual": linha.percentual};
           acoes.push(acao);
         }
       });
@@ -107,7 +107,6 @@ export class CriarCarteiraComponent {
       if(await this.validarIdsAcoesTabela(acoes)){
         return alert('Um ou mais IDs de ações foram informados incorretamente.');
       }
-
       const response = await firstValueFrom(this.authService.consultarCotacoes(acoes));
       this.ajustarCotacaoTabela(response);
     }
@@ -115,7 +114,7 @@ export class CriarCarteiraComponent {
   
   ajustarCotacaoTabela(result: any): void{
     this.linhas.forEach(linha => {
-      var acaoRetorno = result.result.find((x: any) => x.idAcao === linha.idAcao);
+      var acaoRetorno = result.result.find((x: any) => x.acaoID === linha.acaoID);
       linha.setorAcao = acaoRetorno.setorAcao;
       linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
     });
@@ -128,7 +127,7 @@ export class CriarCarteiraComponent {
     const nomesAcoes = await firstValueFrom(this.authService.consultarIdsAcoes());
     let acaoIncorreta = false;
     acoes.forEach(acao => {
-      if(!nomesAcoes.result.includes(acao.idAcao)){
+      if(!nomesAcoes.result.includes(acao.acaoID)){
         acaoIncorreta = true;
       }
     });

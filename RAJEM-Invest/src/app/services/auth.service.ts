@@ -59,7 +59,7 @@ export class AuthService {
     });
   }
 
-  adicionarSaldoCarteira(email: string, carteiraId: string, saldo: number): Observable<{ success: boolean; error?: string, novoSaldo?: number }> {
+  adicionarSaldoCarteira(email: string, carteiraId: string, saldo: number): Observable<{ success: boolean; error?: string, novoSaldo?: number,  valorNaoInvestido?: number}> {
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/adicionar-saldo-carteira`, {
       email,
       carteiraId,
@@ -71,6 +71,13 @@ export class AuthService {
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/validar-quantidade-acoes`, {
       investimentoInicial: valorInicial,
       acoes: acoes
+    });
+  }
+
+  rebalancoCarteira(valorNaoInvestido: number, acoes: Array<object>): Observable<{ success: boolean; error?: string, result: Array<object>, saldoInsuficiente?: boolean }>{
+    return this.http.post<{ success: boolean; error?: string; result: Array<object>}>(`${this.apiUrl}/rebalancear-carteira-acoes`, {
+      valorNaoInvestido,
+      acoes
     });
   }
 

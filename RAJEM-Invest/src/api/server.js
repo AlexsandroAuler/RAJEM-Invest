@@ -4,7 +4,7 @@ const { generateUniqueToken, validateToken, salvarUsuarioBanco,
   login, validarEmailJaCadastrado, getAllActions, getUserIdByEmail, 
   saveNewWallet, GetListWallets, GetSingleWallet, saveNewActionsOnWallet, 
   removeActionsOnWallet, getWalletIdByName, getSpecificAction, 
-  addBallanceToWallet, updateWallet } = require('./index');
+  addBallanceToWallet, updateWallet, suggestQuantityToBuy, rebalanceWallet } = require('./index');
 
 const app = express();
 
@@ -237,7 +237,7 @@ app.post('/adicionar-saldo-carteira', async(req, res) => {
   }
   try{
     result = await addBallanceToWallet(userId.toString(), carteiraId.toString(), saldo);
-    return res.status(200).json({ success: true, novoSaldo : result });
+    return res.status(200).json({ success: true, novoSaldo : result.valorInvestimento, valorNaoInvestido: result.valorNaoInvestido});
   }catch(error){
     console.error('Erro ao remover ações:', error);
     res.status(500).json({ success: false, error: 'Erro interno.' });
@@ -250,26 +250,19 @@ app.post('/adicionar-saldo-carteira', async(req, res) => {
 
 app.post('/validar-quantidade-acoes', async(req, res) => {
   const { investimentoInicial, acoes  } = req.body;
-  let retorno = [];
-
-  for (const acao of acoes) {
-    const valorTotalAcao = Number(investimentoInicial * (acao.percentualDefinidoParaCarteira / 100));
-    const detalhesAcao = await getSpecificAction(acao.acaoID);
-    const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
-    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
-    const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
-    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
-
-    let acaoRetorno = {
-      acaoID: acao.acaoID,
-      percentual: acao.percentual,
-      quantidade: quantidadeDeAcoes,
-      cotacaoAtual: valorAcao
-    };
-    retorno.push(acaoRetorno);
-  }
+  const retorno = suggestQuantityToBuy(investimentoInicial, acoes);
 
   res.status(200).json({ result: retorno });
+});
+
+app.post('/rebalancear-carteira-acoes', async(req, res) => {
+  const { valorNaoInvestido, acoes } = req.body;
+  const retorno = await rebalanceWallet(valorNaoInvestido, acoes);
+  if(!retorno){
+    res.status(200).json({ saldoInsuficiente: true });
+  }else{
+    res.status(200).json({ result: retorno });
+  }
 });
 
 app.post('/consultar-cotacoes', async(req, res) => {

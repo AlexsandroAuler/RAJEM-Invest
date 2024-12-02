@@ -33,6 +33,8 @@
             <div class="scroll">
                 <h1>Carteira: {{carteiraInfo.carteira?.nomeCarteira ?? ""}}</h1>
                 <h3>Valor Total Alocado na Carteira: R$ {{carteiraInfo.carteira?.valorInvestimento ?? ""}}</h3>
+                <h3 *ngIf="valorTotalCarteiraCotacaoAtual > 0">Valor Total dos Ativos na Carteira (Cotação Atual): R$ {{valorTotalCarteiraCotacaoAtual}}</h3>
+                <h3 *ngIf="carteiraInfo.carteira?.valorNaoInvestido > 0">Valor Não Investido na Carteira: R$ {{carteiraInfo.carteira?.valorNaoInvestido ?? ""}}</h3>
                 <table class="tabela-acoes">
                     <thead>
                         <tr>
@@ -66,7 +68,8 @@
             <button class="button-carteira" (click)="adicionarLinha()">Adicionar Nova Ação</button>
             <button class="button-carteira" (click)="calcularTabela()">Consultar Cotações</button>
             <button class="button-carteira" (click)="sugerirCompra()" *ngIf="primeiraCompra">Sugerir Compra</button>
-            <button class="button-carteira" (click)="rebalancoCarteira()" *ngIf="!primeiraCompra">Rebalancear</button>
+            <button class="button-carteira" (click)="rebalancoCarteira()" *ngIf="!primeiraCompra" title="Ao rebalancear, o valor não investido será utilizado como base para cancular
+            o rebalanceamento da carteira.">Rebalancear</button>
             <button class="button-carteira" (click)="salvarCarteira()">Salvar Carteira</button>
         </section>
     </main>  

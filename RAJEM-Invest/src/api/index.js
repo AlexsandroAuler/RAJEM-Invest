@@ -174,6 +174,7 @@ async function saveNewWallet(usuarioID, nomeCarteira, valorInvestimento) {
     usuarioID,
     nomeCarteira,
     valorInvestimento,
+    valorNaoInvestido: 0,
     primeiraCompra: true //caso esteja false libera o rebalanço da carteira
   };
 
@@ -270,9 +271,14 @@ async function updateWallet(userId, carteiraInfo) {
     _id: new ObjectId(carteiraInfo.carteira._id),
     usuarioID: userId
   };
-
+  
+  console.log(carteiraInfo.carteira)
   const update = {
-    $set: { primeiraCompra: false }
+    $set: { 
+      primeiraCompra: false,
+      valorInvestimento: carteiraInfo.carteira.valorInvestimento,
+      valorNaoInvestido: carteiraInfo.carteira.valorNaoInvestido
+     }
   };
 
   const options = { returnDocument: 'after' }; // Retorna o documento atualizado
@@ -312,14 +318,31 @@ async function addBallanceToWallet(userId, carteiraID, saldo) {
     usuarioID: userId
   };
 
-  const update = {
-    $inc: { valorInvestimento: + saldo }
-  };
-  const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+  const carteira = await collectionCarteira.findOne(queryCarteira);
 
-  const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
-  console.log(result.valorInvestimento);
-  return result.valorInvestimento
+  if(carteira.primeiraCompra){
+    const update = {
+      $inc: { valorInvestimento: + saldo }
+    };
+
+    const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+  
+    const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
+    console.log(result.valorInvestimento);
+    return result.valorInvestimento;
+  }else{
+    const update = {
+      $inc: { valorNaoInvestido: + saldo }
+    };
+
+    const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+  
+    const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
+    console.log(result.valorInvestimento);
+    return result;
+  }
+
+  
 }
 
 async function validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
@@ -329,6 +352,71 @@ async function validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quant
     throw new Error('Combinação de ação e carteira não encontrada.');
 
   return wallet.quantidadeAcao;
+}
+
+async function suggestQuantityToBuy(investimentoInicial, acoes){
+  let retorno = [];
+
+  for (const acao of acoes) {
+    const valorTotalAcao = Number(investimentoInicial * (acao.percentualDefinidoParaCarteira / 100));
+    const detalhesAcao = await getSpecificAction(acao.acaoID);
+    const valorAcao = actualActionPrice(detalhesAcao[0]);
+    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+
+    let acaoRetorno = {
+      acaoID: acao.acaoID,
+      percentual: acao.percentual,
+      quantidade: quantidadeDeAcoes,
+      cotacaoAtual: valorAcao
+    };
+    retorno.push(acaoRetorno);
+  }
+
+  return retorno;
+}
+
+async function rebalanceWallet(valorNaoInvestido, acoes){
+  let retorno = [];
+  // console.log(valorNaoInvestido);
+  // console.log(acoes);
+  const somatoriaPercentuaisDefasados = acoes.reduce((accumulator, acao) => accumulator + acao.distanciaDoObjetivo, 0);
+
+  for (const acao of acoes){
+    const percentualAcao = parseFloat(((acao.distanciaDoObjetivo * 100) / somatoriaPercentuaisDefasados).toFixed(2));
+    console.log(percentualAcao);
+    const valorTotalAcao = parseFloat(((percentualAcao * valorNaoInvestido) / 100).toFixed(2));
+    const detalhesAcao = await getSpecificAction(acao.acaoID);
+
+    const valorAcao = actualActionPrice(detalhesAcao[0]);
+    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+  
+    let acaoRetorno = {
+      acaoID: acao.acaoID,
+      percentual: percentualAcao,
+      quantidade: quantidadeDeAcoes,
+      cotacaoAtual: valorAcao
+    };
+
+    retorno.push(acaoRetorno);
+  }
+
+  //se nenhuma acao tiver quantidade maior que 0 (zero) é pq o saldo não foi suficiente pra comprar nem uma ação
+  //se apenas uma tiver saldo já é retornado a lista com o rebalanco
+  for(const item of retorno){
+    if(item.quantidade > 0){
+      return retorno;
+    } 
+  }
+  
+  return false;
+}
+
+function actualActionPrice(acao){
+  const valorFechamentoAcao = parseFloat(acao.close.toFixed(2));
+  const valorVariacaoAcao = parseFloat(acao.change.toFixed(2));
+  const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
+
+  return valorAcao;
 }
 
 async function existActionOnWallet(userID, carteiraID, acaoID) {
@@ -387,5 +475,7 @@ module.exports = {
   removeActionsOnWallet,
   getWalletIdByName,
   addBallanceToWallet,
-  updateWallet
+  updateWallet,
+  suggestQuantityToBuy,
+  rebalanceWallet
 };

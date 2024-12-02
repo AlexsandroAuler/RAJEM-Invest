@@ -19,6 +19,7 @@ export class EditarCarteiraComponent {
   primeiraCompra: boolean = true;
   mensagemErro = '';
   cotacoesAtualizadas = new Array<any>;
+  valorTotalCarteiraCotacaoAtual: number = 0;
   
   linhas: { acaoID: string; setorAcao: string; objetivo: number;
     cotacaoAtual: number; quantidade: number, patrimonioAtualizado: number, 
@@ -59,12 +60,16 @@ export class EditarCarteiraComponent {
 
       this.carteiraInfo.acoesCarteira.forEach(acao => {
         const valorAtualizadoCotacao = this.cotacoesAtualizadas.find((x: any) => x.acaoID === acao.acaoID).cotacaoAtual;
-        const patrimonioAcao = Number((valorAtualizadoCotacao * acao.quantidadeAcao).toFixed(2));
-        const participacaoAtual = Number(((patrimonioAcao * 100) / valorTotalCarteira ).toFixed(2))
-        const distanciaObjetivo = Number((participacaoAtual - acao.percentualDefinidoParaCarteira).toFixed(2));
+        const patrimonioAcao = this.formatarValor(valorAtualizadoCotacao * acao.quantidadeAcao)
+        const participacaoAtual = this.formatarValor((patrimonioAcao * 100) / valorTotalCarteira);
+        const distanciaObjetivo = this.formatarValor(participacaoAtual - acao.percentualDefinidoParaCarteira);
+
+        this.valorTotalCarteiraCotacaoAtual += patrimonioAcao;//valor atualizado pela cotação de agora
 
         this.adicionarLinhaAcao(acao.acaoID, acao.setorAcao, 0, acao.quantidadeAcao, patrimonioAcao, participacaoAtual, acao.percentualDefinidoParaCarteira, distanciaObjetivo);
       });
+
+      this.valorTotalCarteiraCotacaoAtual = this.formatarValor(this.valorTotalCarteiraCotacaoAtual);
 
     } catch (erro) {
       console.error('Erro ao carregar carteiras:', erro);
@@ -78,7 +83,7 @@ export class EditarCarteiraComponent {
       if (acaoB) {
         total += acaoA.quantidadeAcao * acaoB.cotacaoAtual;
       }
-      return Number(total.toFixed(2));
+      return this.formatarValor(total);
     }, 0);
   }
 
@@ -91,6 +96,7 @@ export class EditarCarteiraComponent {
 
       if(response.success){
         this.carteiraInfo.carteira.valorInvestimento = response.novoSaldo;
+        this.carteiraInfo.carteira.valorNaoInvestido = response.valorNaoInvestido;
         this.valorInvestimento = 0;
       }
     }
@@ -171,14 +177,37 @@ export class EditarCarteiraComponent {
   }
 
   async rebalancoCarteira(): Promise<void>{
+    if(await this.validar()){
+      this.alertar();
+    }
+    else{
+      let acoesParaRebalancear: any[] = [];
 
+      this.linhas.forEach(linha => {
+        var acao = this.carteiraInfo.acoesCarteira.find((x: any) => x.acaoID === linha.acaoID);
+        if(linha.distanciaDoObjetivo < 0){
+          acao.distanciaDoObjetivo = linha.distanciaDoObjetivo;
+          acoesParaRebalancear.push(acao);
+        }
+      });
+      
+      const result = await firstValueFrom(this.authService.rebalancoCarteira(this.carteiraInfo.carteira.valorNaoInvestido, acoesParaRebalancear));
+      
+      if(result.saldoInsuficiente){
+        alert('Saldo insuficiente para a compra das ações.')
+      }else{
+        this.rebalancoTabela(result);
+        this.carteiraInfo.carteira.valorInvestimento += this.carteiraInfo.carteira.valorNaoInvestido;
+        this.carteiraInfo.carteira.valorNaoInvestido = 0;
+      }
+    }
   }
 
   async salvarCarteira(): Promise<void>{
     if (this.username && this.carteiraInfo.carteira && this.carteiraInfo.acoesCarteira) {
       // Faz a requisição para adicionar uma nova carteira
-      debugger;
-      //salvar as cotacoes e quantidades antes de enviar pra salvar
+
+      //Salvar as cotacoes e quantidades antes de enviar pra salvar
       this.ajustarValoresCarteira();
       const response = await firstValueFrom(this.authService.salvarCarteira(this.username, this.carteiraInfo));
       
@@ -199,6 +228,13 @@ export class EditarCarteiraComponent {
       var acaoRetorno = result.result.find((x: any) => x.acaoID === linha.acaoID);
       linha.quantidade = acaoRetorno.quantidade;
     });
+  }
+
+  rebalancoTabela(result: any): void{
+    this.linhas.forEach(linha => {
+      var acaoRetorno = result.result.find((x: any) => x.acaoID === linha.acaoID);
+      linha.quantidade += acaoRetorno?.quantidade ?? 0;
+    });  
   }
 
   async validar(): Promise<boolean>{
@@ -237,5 +273,12 @@ export class EditarCarteiraComponent {
       return true;
     else
     return false;
+  }
+
+  formatarValor(valor: any): number{
+    if(!valor)
+      return Number(valor.toFixed(2));
+
+    return valor;
   }
 }

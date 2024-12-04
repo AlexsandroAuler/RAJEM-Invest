@@ -12,9 +12,10 @@ body{
   width: 550px;
   justify-content: center;
   align-items: center;
-  flex: 1;
+  flex: 1;  
   border-right: 1px solid black;
 }
+
 .title{
   display: flex;
   align-items: center;

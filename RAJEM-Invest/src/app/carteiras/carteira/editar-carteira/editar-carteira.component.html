@@ -32,7 +32,6 @@
         <section class="carteiras">
             <div class="scroll">
                 <h1>Carteira: {{carteiraInfo.carteira?.nomeCarteira ?? ""}}</h1>
-                <h3>Valor Total Alocado na Carteira: R$ {{carteiraInfo.carteira?.valorInvestimento ?? ""}}</h3>
                 <h3 *ngIf="valorTotalCarteiraCotacaoAtual > 0">Valor Total dos Ativos na Carteira (Cotação Atual): R$ {{valorTotalCarteiraCotacaoAtual}}</h3>
                 <h3 *ngIf="carteiraInfo.carteira?.valorNaoInvestido > 0">Valor Não Investido na Carteira: R$ {{carteiraInfo.carteira?.valorNaoInvestido ?? ""}}</h3>
                 <table class="tabela-acoes">
@@ -54,7 +53,7 @@
                             <td><input type="text" [(ngModel)]="linha.setorAcao" disabled></td>
                             <td><input type="number" [(ngModel)]="linha.quantidade"></td>
                             <td><input type="number" [(ngModel)]="linha.cotacaoAtual" disabled></td>
-                            <td><input type="number" [(ngModel)]="linha.patrimonioAtualizado"></td>
+                            <td><input type="number" [(ngModel)]="linha.patrimonioAtualizado" disabled></td>
                             <td><input type="number" [(ngModel)]="linha.participacaoAtual" disabled></td>
                             <td><input type="number" [(ngModel)]="linha.objetivo"></td>
                             <td><input type="number" [value]="linha.distanciaDoObjetivo" disabled></td>

@@ -272,7 +272,6 @@ async function updateWallet(userId, carteiraInfo) {
     usuarioID: userId
   };
   
-  console.log(carteiraInfo.carteira)
   const update = {
     $set: { 
       primeiraCompra: false,
@@ -284,7 +283,6 @@ async function updateWallet(userId, carteiraInfo) {
   const options = { returnDocument: 'after' }; // Retorna o documento atualizado
   const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
 
-  console.log(result);
   return result;
 }
 
@@ -318,31 +316,14 @@ async function addBallanceToWallet(userId, carteiraID, saldo) {
     usuarioID: userId
   };
 
-  const carteira = await collectionCarteira.findOne(queryCarteira);
-
-  if(carteira.primeiraCompra){
-    const update = {
-      $inc: { valorInvestimento: + saldo }
-    };
-
-    const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+  const update = {
+        $inc: { valorNaoInvestido: + saldo }
+      };
   
-    const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
-    console.log(result.valorInvestimento);
-    return result.valorInvestimento;
-  }else{
-    const update = {
-      $inc: { valorNaoInvestido: + saldo }
-    };
-
-    const options = { returnDocument: 'after' }; // Retorna o documento atualizado
-  
-    const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
-    console.log(result.valorInvestimento);
-    return result;
-  }
-
-  
+      const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+    
+      const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
+      return result;
 }
 
 async function validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
@@ -365,7 +346,7 @@ async function suggestQuantityToBuy(investimentoInicial, acoes){
 
     let acaoRetorno = {
       acaoID: acao.acaoID,
-      percentual: acao.percentual,
+      percentual: acao.percentualDefinidoParaCarteira,
       quantidade: quantidadeDeAcoes,
       cotacaoAtual: valorAcao
     };
@@ -377,13 +358,10 @@ async function suggestQuantityToBuy(investimentoInicial, acoes){
 
 async function rebalanceWallet(valorNaoInvestido, acoes){
   let retorno = [];
-  // console.log(valorNaoInvestido);
-  // console.log(acoes);
   const somatoriaPercentuaisDefasados = acoes.reduce((accumulator, acao) => accumulator + acao.distanciaDoObjetivo, 0);
 
   for (const acao of acoes){
     const percentualAcao = parseFloat(((acao.distanciaDoObjetivo * 100) / somatoriaPercentuaisDefasados).toFixed(2));
-    console.log(percentualAcao);
     const valorTotalAcao = parseFloat(((percentualAcao * valorNaoInvestido) / 100).toFixed(2));
     const detalhesAcao = await getSpecificAction(acao.acaoID);
 
@@ -412,10 +390,12 @@ async function rebalanceWallet(valorNaoInvestido, acoes){
 }
 
 function actualActionPrice(acao){
-  const valorFechamentoAcao = parseFloat(acao.close.toFixed(2));
-  const valorVariacaoAcao = parseFloat(acao.change.toFixed(2));
-  const valorAcao = parseFloat(valorFechamentoAcao + valorVariacaoAcao).toFixed(2);
+  // Deveria ser esse o cálculo, pq não faz sentido o valor de fechamento ser o atual (mas é)
+  // const valorFechamentoAcao = parseFloat(acao.close.toFixed(2));
+  // const VariacaoAcao = 1 + (acao.change / 100);
+  // const valorAcao = parseFloat(valorFechamentoAcao + VariacaoAcao).toFixed(2);
 
+  const valorAcao = parseFloat(acao.close.toFixed(2));
   return valorAcao;
 }
 

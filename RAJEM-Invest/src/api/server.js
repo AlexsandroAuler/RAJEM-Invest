@@ -250,7 +250,7 @@ app.post('/adicionar-saldo-carteira', async(req, res) => {
 
 app.post('/validar-quantidade-acoes', async(req, res) => {
   const { investimentoInicial, acoes  } = req.body;
-  const retorno = suggestQuantityToBuy(investimentoInicial, acoes);
+  const retorno = await suggestQuantityToBuy(investimentoInicial, acoes);
 
   res.status(200).json({ result: retorno });
 });
@@ -267,7 +267,6 @@ app.post('/rebalancear-carteira-acoes', async(req, res) => {
 
 app.post('/consultar-cotacoes', async(req, res) => {
   const { acoes } = req.body;
-  console.log(acoes);
   let retorno = [];
 
   for (const acao of acoes) {

@@ -123,7 +123,7 @@ export class EditarCarteiraComponent {
 
   async calcularTabela(): Promise<void> {
     if(await this.validar()){
-      this.alertar();
+      return this.alertar();
     }
 
     else{
@@ -165,10 +165,10 @@ export class EditarCarteiraComponent {
 
   async sugerirCompra(): Promise<void>{
     if(await this.validar()){
-      this.alertar();
+      return this.alertar();
     }
     else{
-      const result = await firstValueFrom(this.authService.calcularQuantidades(this.carteiraInfo.carteira.valorInvestimento, this.carteiraInfo.acoesCarteira));
+      const result = await firstValueFrom(this.authService.calcularQuantidades(this.carteiraInfo.carteira.valorNaoInvestido, this.carteiraInfo.acoesCarteira));
       if(!result)
         alert('Ocorreu um erro inesperado, por favor tente novamente.');
       else
@@ -178,7 +178,7 @@ export class EditarCarteiraComponent {
 
   async rebalancoCarteira(): Promise<void>{
     if(await this.validar()){
-      this.alertar();
+      return this.alertar();
     }
     else{
       let acoesParaRebalancear: any[] = [];
@@ -228,6 +228,8 @@ export class EditarCarteiraComponent {
       var acaoRetorno = result.result.find((x: any) => x.acaoID === linha.acaoID);
       linha.quantidade = acaoRetorno.quantidade;
     });
+
+    this.carteiraInfo.carteira.valorNaoInvestido = 0;
   }
 
   rebalancoTabela(result: any): void{
@@ -243,7 +245,15 @@ export class EditarCarteiraComponent {
       return true;
     }
 
-    if(await this.validarIdsAcoesTabela(this.carteiraInfo.acoesCarteira)){
+    let acoesTabela = new Array<any>();
+    this.linhas.forEach(linha => {
+      if (linha.acaoID) {
+        const acao = {"acaoID": linha.acaoID};
+        acoesTabela.push(acao);
+      }
+    });
+
+    if(await this.validarIdsAcoesTabela(acoesTabela)){
        this.mensagemErro = 'Um ou mais IDs de ações foram informados incorretamente.';
        return true;
     }
@@ -276,7 +286,7 @@ export class EditarCarteiraComponent {
   }
 
   formatarValor(valor: any): number{
-    if(!valor)
+    if(valor)
       return Number(valor.toFixed(2));
 
     return valor;

@@ -239,7 +239,7 @@ app.post('/adicionar-saldo-carteira', async(req, res) => {
     result = await addBallanceToWallet(userId.toString(), carteiraId.toString(), saldo);
     return res.status(200).json({ success: true, novoSaldo : result.valorInvestimento, valorNaoInvestido: result.valorNaoInvestido});
   }catch(error){
-    console.error('Erro ao remover ações:', error);
+    console.error('Erro ao adicionar saldo na carteira:', error);
     res.status(500).json({ success: false, error: 'Erro interno.' });
   }
 });
@@ -342,9 +342,8 @@ app.post('/salvar-carteira', async(req, res) => {
 });
 
 app.post('/remover-acao-carteira', async(req, res) => {
-  const { email, nomeCarteira, acaoID, quantidadeAcao} = req.body;
+  const { email, carteiraId, acaoID, quantidadeAcao} = req.body;
   const userId = await getUserIdByEmail(email);
-  const carteiraId = await getWalletIdByName(nomeCarteira);
 
   if(userId == null){
     return res.status(400).json({ error: 'Nenhum usuário vinculado ao e-mail' });

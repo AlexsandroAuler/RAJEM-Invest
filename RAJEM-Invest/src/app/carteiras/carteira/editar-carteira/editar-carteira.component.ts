@@ -117,8 +117,31 @@ export class EditarCarteiraComponent {
       this.linhas.push({ acaoID, setorAcao, quantidade, cotacaoAtual, patrimonioAtualizado, participacaoAtual, objetivo,distanciaDoObjetivo });
   }
 
-  removerLinha(index: number): void {
-    this.linhas.splice(index, 1);
+  async removerLinha(index: number): Promise<void> {
+    const carteiraId = this.route.snapshot.paramMap.get('id');
+    const linhaSelecionada = this.linhas[index];
+    const quantidadeAtual = linhaSelecionada.quantidade;
+    const quantidadeRemover = parseInt(prompt("Quantas ações você deseja remover?") || "0", 10);
+
+    if (carteiraId != null && !isNaN(quantidadeRemover) && quantidadeRemover > 0) {
+        if (quantidadeRemover > quantidadeAtual) {
+            alert("A quantidade informada excede o número de ações na carteira.");
+        } else {
+            const response = await firstValueFrom(this.authService.removerAcoesCarteira(this.username, carteiraId, linhaSelecionada.acaoID, quantidadeRemover));
+
+            if(quantidadeAtual == quantidadeRemover)
+              this.linhas.splice(index, quantidadeRemover);
+            else
+              this.linhas[index].quantidade -= quantidadeRemover;
+
+            // await this.carregarDadosCarteira(carteiraId);
+            // this.ajustarCotacaoTabela(this.cotacoesAtualizadas);
+
+            alert(`${quantidadeRemover} ação(ões) removida(s) com sucesso.`);
+        }
+    }else {
+        alert("Quantidade inválida. Nenhuma ação foi removida.");
+    }
   }
 
   async calcularTabela(): Promise<void> {
@@ -205,7 +228,9 @@ export class EditarCarteiraComponent {
 
   async salvarCarteira(): Promise<void>{
     if (this.username && this.carteiraInfo.carteira && this.carteiraInfo.acoesCarteira) {
-      // Faz a requisição para adicionar uma nova carteira
+      if(await this.validar()){
+        return this.alertar();
+      }
 
       //Salvar as cotacoes e quantidades antes de enviar pra salvar
       this.ajustarValoresCarteira();

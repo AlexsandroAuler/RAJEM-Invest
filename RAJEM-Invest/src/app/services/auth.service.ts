@@ -98,5 +98,14 @@ export class AuthService {
     });
   }
 
+  removerAcoesCarteira(email: string, carteiraId : string, acaoID: string, quantidadeAcao: number): Observable<{ success: boolean; error?: string, result?: any }>{
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/remover-acao-carteira`, {
+      email,
+      carteiraId,
+      acaoID,
+      quantidadeAcao
+    });
+  }
+
 }
 

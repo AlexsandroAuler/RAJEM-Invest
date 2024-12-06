@@ -291,7 +291,7 @@ app.get('/get-all-actions', async(req, res) => {
 
   result = await getAllActions();
 
-  return res.status(200).json({ result : result });
+  return res.status(200).json({ result : result.stocks });
 });
 
 app.get('/get-specific-action', async(req, res) => {

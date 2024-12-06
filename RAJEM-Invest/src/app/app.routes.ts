@@ -6,6 +6,7 @@ import { LiberarAcessoComponent } from './login/liberar-acesso/liberar-acesso.co
 import { CriarCarteiraComponent } from './carteiras/carteira/criar-carteira/criar-carteira.component';
 import { EditarCarteiraComponent } from './carteiras/carteira/editar-carteira/editar-carteira.component';
 import { ListCarteirasComponent } from './carteiras/carteira/list-carteiras/list-carteiras.component';
+import { ListAtivosComponent } from './ativos/list-ativos/list-ativos.component';
 import { authGuard } from './guards/auth.guard';
 
 
@@ -17,5 +18,6 @@ export const appRoutes: Routes = [
   { path: 'liberar-acesso', component: LiberarAcessoComponent, canActivate: [authGuard] },
   { path: 'editar-carteira/:id', component: EditarCarteiraComponent, canActivate: [authGuard] },
   { path: 'listar-carteira', component: ListCarteirasComponent, canActivate: [authGuard] },
-  { path: 'criar-carteira', component: CriarCarteiraComponent,canActivate: [authGuard] }
+  { path: 'criar-carteira', component: CriarCarteiraComponent,canActivate: [authGuard] },
+  { path: 'listar-ativos', component: ListAtivosComponent,canActivate: [authGuard] }
 ];

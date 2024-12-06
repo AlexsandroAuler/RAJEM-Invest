@@ -91,6 +91,10 @@ export class AuthService {
     return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-all-actions-names`, {});
   }
 
+  consultarTodasAcoes(): Observable<{ result: Array<string> }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-all-actions`, {});
+  }
+
   salvarCarteira(email: string, carteiraInfo : any): Observable<{ success: boolean; error?: string, result?: any }>{
     return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/salvar-carteira`, {
       email,

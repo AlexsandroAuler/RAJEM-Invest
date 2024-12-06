@@ -3,8 +3,8 @@
         <div class="nav">
             <div class="logo">RAJEM <span class="invest">INVEST</span></div>
             <nav>
-                <a href="#">Ativos</a>
-                <a href="#">Carteiras</a>
+                <a (click)="listagemAtivos()">Ativos</a>
+                <a (click)="listagemCarteiras()">Carteiras</a>
             </nav>
             <div class="profile">
                 <div class="avatar">{{ username ? username.charAt(0).toUpperCase() : 'U' }}</div> <!-- Primeira letra do username -->

@@ -50,4 +50,12 @@ export class ListCarteirasComponent implements OnInit {
   selecionarCarteira(carteira: any): void {
     this.carteiraSelecionada = carteira;
   }
+
+  listagemAtivos(): void{
+    this.router.navigate(['/listar-ativos']);
+  }
+
+  listagemCarteiras(): void{
+    this.router.navigate(['/listar-carteira']);
+  }
 }

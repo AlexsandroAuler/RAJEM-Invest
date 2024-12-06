@@ -316,4 +316,12 @@ export class EditarCarteiraComponent {
 
     return valor;
   }
+
+  listagemAtivos(): void{
+    this.router.navigate(['/listar-ativos']);
+  }
+
+  listagemCarteiras(): void{
+    this.router.navigate(['/listar-carteira']);
+  }
 }

@@ -133,10 +133,7 @@ export class EditarCarteiraComponent {
               this.linhas.splice(index, quantidadeRemover);
             else
               this.linhas[index].quantidade -= quantidadeRemover;
-
-            // await this.carregarDadosCarteira(carteiraId);
-            // this.ajustarCotacaoTabela(this.cotacoesAtualizadas);
-
+            
             alert(`${quantidadeRemover} ação(ões) removida(s) com sucesso.`);
         }
     }else {
@@ -152,10 +149,8 @@ export class EditarCarteiraComponent {
     else{
       let acoes = new Array<any>();
       this.linhas.forEach(linha => {
-        if (linha.objetivo > 0) {
-          const acao = {"acaoID": linha.acaoID, "percentual": linha.objetivo};
-          acoes.push(acao);
-        }
+        const acao = {"acaoID": linha.acaoID, "percentual": linha.objetivo};
+        acoes.push(acao);   
       });
 
       const response = await firstValueFrom(this.authService.consultarCotacoes(acoes));

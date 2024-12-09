@@ -1,1 +1,73 @@
-<p>editar-carteira works!</p>
+<body>
+    <header>
+        <div class="nav">
+            <div class="logo">RAJEM <span class="invest">INVEST</span></div>
+            <nav>
+                <a (click)="listagemCarteiras()">Carteiras</a>
+                <a (click)="listagemCarteiras()">Ações</a>
+            </nav>
+            <div class="profile">
+                <div class="avatar">{{ username ? username.charAt(0).toUpperCase() : 'U' }}</div>
+                <div class="username">{{ username || 'Nome investidor' }}</div>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="secaoAporte">
+            <h1>Realizar Aporte</h1>
+            <div class="carteira-list">
+                <ul>
+                    <li> 
+                        Valor de Investimento:
+                    </li>
+                    <li><input class="inputsPadrao" type="number" [(ngModel)]="valorInvestimento" id="valorInvestimento" min="0" 
+                        step="any" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189 && event.keyCode !== 190"
+                        placeholder="Digite o valor do investimento" oninput="this.value = this.value < 0 ? 0 : this.value">
+                    </li>
+                </ul>
+            </div>
+            <button class="button-carteira" (click)="adicionarSaldoCarteira()">Adicionar Saldo</button>
+            <button class="voltar-carteira" (click)="voltarCarteira()">Voltar</button>
+        </section>
+        <section class="carteiras">
+            <div class="scroll">
+                <h1>Carteira: {{carteiraInfo.carteira?.nomeCarteira ?? ""}}</h1>
+                <h3 *ngIf="valorTotalCarteiraCotacaoAtual > 0">Valor Total dos Ativos na Carteira (Cotação Atual): R$ {{valorTotalCarteiraCotacaoAtual}}</h3>
+                <h3 *ngIf="carteiraInfo.carteira?.valorNaoInvestido > 0">Valor Não Investido na Carteira: R$ {{carteiraInfo.carteira?.valorNaoInvestido ?? ""}}</h3>
+                <table class="tabela-acoes">
+                    <thead>
+                        <tr>
+                            <th>Ativo</th>
+                            <th>Setor</th>
+                            <th>Quantidade</th>
+                            <th>Cotação Atual</th>
+                            <th>Patrimônio Atualizado</th>
+                            <th>Participação Atual (%)</th>
+                            <th>Objetivo (%)</th>
+                            <th>Distância do Objetivo (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let linha of linhas; let i = index">
+                            <td><input type="text" [(ngModel)]="linha.acaoID" class="inputsPadrao2"></td>
+                            <td><input type="text" [(ngModel)]="linha.setorAcao" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.quantidade" class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.cotacaoAtual" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.patrimonioAtualizado" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.participacaoAtual" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.objetivo" class="inputsPadrao2"></td>
+                            <td><input type="number" [value]="linha.distanciaDoObjetivo" disabled class="inputsPadrao2"></td>
+                            <td><button class="remover" (click)="removerLinha(i)">Remover</button></td>
+                        </tr>
+                    </tbody>
+                </table>                
+            </div>
+            <button class="button-carteira" (click)="adicionarLinha()">Adicionar Nova Ação</button>
+            <button class="button-carteira" (click)="calcularTabela()">Consultar Cotações</button>
+            <button class="button-carteira" (click)="sugerirCompra()" *ngIf="primeiraCompra">Sugerir Compra</button>
+            <button class="button-carteira" (click)="rebalancoCarteira()" *ngIf="!primeiraCompra" title="Ao rebalancear, o valor não investido será utilizado como base para cancular
+            o rebalanceamento da carteira.">Rebalancear</button>
+            <button class="button-carteira" (click)="salvarCarteira()">Salvar Carteira</button>
+        </section>
+    </main>  
+</body>

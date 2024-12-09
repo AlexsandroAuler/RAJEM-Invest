@@ -1,7 +1,8 @@
 const { MongoClient, ServerApiVersion  } = require('mongodb');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
-const { getAll } = require('./braviapi');
+const { ObjectId } = require('mongodb');
+const { getAll, getSpecificStock } = require('./braviapi');
 
 const uri = 'mongodb+srv://RajemBase:Rajem$@baserajem.dxyth.mongodb.net/?retryWrites=true&w=majority&appName=BaseRAJEM';
 const client = new MongoClient(uri, {
@@ -28,7 +29,9 @@ const userSchema = new mongoose.Schema({
     senha: String
   });
   
-  const User = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+
+//#region Token
 
 async function generateUniqueToken(email) {
     const secret = 'RajemSecretKey';
@@ -45,13 +48,6 @@ async function generateUniqueToken(email) {
     return token;
 }
 
-function hashPassword(password){
-    const secret = 'RajemPassword';
-    senhaHash = crypto.createHmac('sha256', secret).update(password).digest('hex');
-
-    return senhaHash;
-}
-
 //"npm install mongodb" pra funcionar neh
 async function saveTokenToDatabase(email, token) {
     //usuario padrao
@@ -59,13 +55,8 @@ async function saveTokenToDatabase(email, token) {
     //usuario admin de teste
     //const uri = 'mongodb+srv://alexauler:yafQr3lG6oQzh5lQ@baserajem.dxyth.mongodb.net/?retryWrites=true&w=majority&appName=BaseRAJEM';
     
-    try {
-        //foi configurado pra conectar por qualquer IP
-        await client.connect();
-        console.log("Conectado ao MongoDB");
-
-        const database = client.db('RajemBase');
-        const collection = database.collection('tokens');
+    try {      
+        const collection = await dataBaseCollectionConnection('tokens');
 
         const tokenDocument = {
             email: email,
@@ -84,11 +75,7 @@ async function saveTokenToDatabase(email, token) {
     }
 }
 async function tokenExiste(token){
-    await client.connect();
-    console.log("Conectado ao MongoDB");
-
-    const database = client.db('RajemBase');
-    const collection = database.collection('tokens');
+    const collection = await dataBaseCollectionConnection('tokens');
 
     const query = {token: token };
     const result = await collection.findOne(query);
@@ -101,11 +88,7 @@ async function tokenExiste(token){
 }
 
 async function validateToken(email, token) {
-    await client.connect();
-    console.log("Conectado ao MongoDB");
-
-    const database = client.db('RajemBase');
-    const collection = database.collection('tokens');
+    const collection = await dataBaseCollectionConnection('tokens');
 
     const query = { email: email, token: token };
     const result = await collection.findOne(query);
@@ -118,12 +101,10 @@ async function validateToken(email, token) {
     }
 }
 
-async function validarEmailJaCadastrado(email) {
-  await client.connect();
-  console.log("Conectado ao MongoDB");
+//#endregion
 
-  const database = client.db('RajemBase');
-  const collection = database.collection('usuarios');
+async function validarEmailJaCadastrado(email) {
+  const collection = await dataBaseCollectionConnection('usuarios');
 
   const query = { email: email };
   const result = await collection.findOne(query);
@@ -148,11 +129,7 @@ async function salvarUsuarioBanco(email, emailRecuperacao, senha) {
       senhaHash
   };
 
-  await client.connect();
-  console.log("Conectado ao MongoDB");
-
-  const database = client.db('RajemBase');
-  const collection = database.collection('usuarios');
+  const collection = await dataBaseCollectionConnection('usuarios');
   const result = await collection.insertOne(newUser);
 
   return result;
@@ -160,12 +137,7 @@ async function salvarUsuarioBanco(email, emailRecuperacao, senha) {
 
 async function login(email, senha){
     const senhaHash = hashPassword(senha);
-
-    await client.connect();
-    console.log("Conectado ao MongoDB");
-
-    const database = client.db('RajemBase');
-    const collection = database.collection('usuarios');
+    const collection = await dataBaseCollectionConnection('usuarios');
 
     const query = { email: email, senhaHash: senhaHash };
 
@@ -180,8 +152,310 @@ async function login(email, senha){
     }
 }
 
-async function getAllActions(){
-  var actions = await getAll();
+function hashPassword(password){
+  const secret = 'RajemPassword';
+  senhaHash = crypto.createHmac('sha256', secret).update(password).digest('hex');
+
+  return senhaHash;
 }
 
-module.exports = { generateUniqueToken, validateToken, salvarUsuarioBanco, login, validarEmailJaCadastrado };
+async function getUserIdByEmail(email){
+  const collection = await dataBaseCollectionConnection('usuarios');
+  const query = { email: email };
+  const result = await collection.findOne(query);
+
+  return result?._id;
+}
+
+async function saveNewWallet(usuarioID, nomeCarteira, valorInvestimento) {
+  const collection = await dataBaseCollectionConnection('carteiras');
+
+  const newWallet = {
+    usuarioID,
+    nomeCarteira,
+    valorInvestimento,
+    valorNaoInvestido: 0,
+    primeiraCompra: true //caso esteja false libera o rebalanço da carteira
+  };
+
+  const result = await collection.insertOne(newWallet);
+  return result?.insertedId;
+}
+
+async function GetListWallets(usuarioID) {
+  const collection = await dataBaseCollectionConnection('carteiras');
+  const query = { usuarioID: usuarioID };
+  const result = await collection.find(query).toArray();
+
+  return result;
+}
+
+async function GetSingleWallet(carteiraID, userId) {
+  if (!ObjectId.isValid(carteiraID)) {
+    return null;
+  }
+
+  const collectionCarteira = await dataBaseCollectionConnection('carteiras');
+  const queryCarteira = { _id: new ObjectId(carteiraID)};
+  const resultCarteira = await collectionCarteira.findOne(queryCarteira);
+
+  const collectionAcoesCarteira = await dataBaseCollectionConnection('carteiraAcoes');
+  const queryAcoesCarteira = { carteiraID: carteiraID};
+  const acoesCarteira = await collectionAcoesCarteira.find(queryAcoesCarteira).toArray();
+
+  const carteiraInfo = {
+    carteira: resultCarteira,
+    acoesCarteira: acoesCarteira
+  };
+
+  return carteiraInfo;
+}
+
+async function saveNewActionsOnWallet(userID, carteiraID, acaoID, setorAcao, quantidadeAcao, cotacaoMomentoCompra, percentualDefinidoParaCarteira) {
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+  const carteiraAcao = {
+    userID,
+    carteiraID,
+    acaoID,
+    setorAcao,
+    quantidadeAcao,
+    cotacaoMomentoCompra,
+    percentualDefinidoParaCarteira
+  };
+
+  var wallet = await existActionOnWallet(userID, carteiraID, acaoID);
+
+  if(wallet == null){
+    var result = await collection.insertOne(carteiraAcao);
+    return result?.insertedId;
+  }else{
+    const filtro = {
+      userID,
+      carteiraID,
+      acaoID
+    };
+    const update = {
+      $inc: { quantidadeAcao: + quantidadeAcao }
+    };
+    const result = await collection.updateOne(filtro, update);
+    return wallet._id;
+  }
+}
+
+async function updateWallet(userId, carteiraInfo) {
+  //atualizar ações da carteira
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+
+  for (const acao of carteiraInfo.acoesCarteira){
+  
+    const queryCarteiraAcao = {
+      _id: new ObjectId(acao._id),
+      userID: acao.userID,
+      carteiraID: acao.carteiraID
+    };
+  
+    const update = {
+      $set: { 
+        quantidadeAcao: acao.quantidadeAcao,
+        cotacaoMomentoCompra: acao.cotacaoMomentoCompra,
+        percentualDefinidoParaCarteira: acao.percentualDefinidoParaCarteira
+      }
+    };
+  
+    await collection.updateOne(queryCarteiraAcao, update);
+  }
+
+  //atualizar carteira
+  const collectionCarteira = await dataBaseCollectionConnection('carteiras');
+  const queryCarteira = {
+    _id: new ObjectId(carteiraInfo.carteira._id),
+    usuarioID: userId
+  };
+  
+  const update = {
+    $set: { 
+      primeiraCompra: false,
+      valorInvestimento: carteiraInfo.carteira.valorInvestimento,
+      valorNaoInvestido: carteiraInfo.carteira.valorNaoInvestido
+     }
+  };
+
+  const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+  const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
+
+  return result;
+}
+
+async function removeActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcaoRemover) {
+  var quantity = await validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcaoRemover);
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+
+  const filtro = {
+    userID,
+    carteiraID,
+    acaoID
+  };
+
+  if(quantity == quantidadeAcaoRemover){
+    var result = await collection.deleteOne(filtro);
+  }else{
+    const update = {
+      $inc: { quantidadeAcao: - quantidadeAcaoRemover }
+    };
+    const result = await collection.updateOne(filtro, update);
+  }
+
+  return true;
+}
+
+async function addBallanceToWallet(userId, carteiraID, saldo) {
+  const collectionCarteira = await dataBaseCollectionConnection('carteiras');
+
+  const queryCarteira = {
+    _id: new ObjectId(carteiraID),
+    usuarioID: userId
+  };
+
+  const update = {
+        $inc: { valorNaoInvestido: + saldo }
+      };
+  
+      const options = { returnDocument: 'after' }; // Retorna o documento atualizado
+    
+      const result = await collectionCarteira.findOneAndUpdate(queryCarteira, update, options);
+      return result;
+}
+
+async function validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
+  const wallet = await existActionOnWallet(userID, carteiraID, acaoID);
+
+  if(wallet == null)
+    throw new Error('Combinação de ação e carteira não encontrada.');
+
+  return wallet.quantidadeAcao;
+}
+
+async function suggestQuantityToBuy(investimentoInicial, acoes){
+  let retorno = [];
+
+  for (const acao of acoes) {
+    const valorTotalAcao = Number(investimentoInicial * (acao.percentualDefinidoParaCarteira / 100));
+    const detalhesAcao = await getSpecificAction(acao.acaoID);
+    const valorAcao = actualActionPrice(detalhesAcao[0]);
+    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+
+    let acaoRetorno = {
+      acaoID: acao.acaoID,
+      percentual: acao.percentualDefinidoParaCarteira,
+      quantidade: quantidadeDeAcoes,
+      cotacaoAtual: valorAcao
+    };
+    retorno.push(acaoRetorno);
+  }
+
+  return retorno;
+}
+
+async function rebalanceWallet(valorNaoInvestido, acoes){
+  let retorno = [];
+  const somatoriaPercentuaisDefasados = acoes.reduce((accumulator, acao) => accumulator + acao.distanciaDoObjetivo, 0);
+
+  for (const acao of acoes){
+    const percentualAcao = parseFloat(((acao.distanciaDoObjetivo * 100) / somatoriaPercentuaisDefasados).toFixed(2));
+    const valorTotalAcao = parseFloat(((percentualAcao * valorNaoInvestido) / 100).toFixed(2));
+    const detalhesAcao = await getSpecificAction(acao.acaoID);
+
+    const valorAcao = actualActionPrice(detalhesAcao[0]);
+    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+  
+    let acaoRetorno = {
+      acaoID: acao.acaoID,
+      percentual: percentualAcao,
+      quantidade: quantidadeDeAcoes,
+      cotacaoAtual: valorAcao
+    };
+
+    retorno.push(acaoRetorno);
+  }
+
+  //se nenhuma acao tiver quantidade maior que 0 (zero) é pq o saldo não foi suficiente pra comprar nem uma ação
+  //se apenas uma tiver saldo já é retornado a lista com o rebalanco
+  for(const item of retorno){
+    if(item.quantidade > 0){
+      return retorno;
+    } 
+  }
+  
+  return false;
+}
+
+function actualActionPrice(acao){
+  //Deveria ser esse o cálculo, pq não faz sentido o valor de fechamento ser o atual (mas é)
+  const valorFechamentoAcao = parseFloat(acao.close.toFixed(2));
+  const VariacaoAcao = 1 + (acao.change / 100);
+  const valorAcao = parseFloat(valorFechamentoAcao + VariacaoAcao).toFixed(2);
+
+  //const valorAcao = parseFloat(acao.close.toFixed(2));
+  return valorFechamentoAcao;
+}
+
+async function existActionOnWallet(userID, carteiraID, acaoID) {
+  const carteiraAcao = {
+    userID,
+    carteiraID,
+    acaoID
+  };
+
+  const collection = await dataBaseCollectionConnection('carteiraAcoes');
+  const result = await collection.findOne(carteiraAcao);
+
+  return result;
+}
+
+async function dataBaseCollectionConnection(collection){
+  //foi configurado pra conectar por qualquer IP
+  await client.connect();
+  const database = client.db('RajemBase');
+
+  return database.collection(collection);
+}
+
+async function getAllActions(){
+  var actions = await getAll();
+  return actions;
+}
+
+async function getSpecificAction(stockID){
+  var actions = await getSpecificStock(stockID);
+  result = actions.stocks.filter(stock => stock.stock == stockID);
+  return result;
+}
+
+async function getWalletIdByName(nomeCarteira) {
+  const collection = await dataBaseCollectionConnection('carteiras');
+  const query = { nomeCarteira: nomeCarteira };
+  const result = await collection.findOne(query);
+
+  return result?._id;
+}
+
+module.exports = { 
+  generateUniqueToken,
+  validateToken,
+  salvarUsuarioBanco,
+  login,
+  validarEmailJaCadastrado,
+  getAllActions,
+  getSpecificAction,
+  getUserIdByEmail,
+  saveNewWallet,
+  GetListWallets,
+  GetSingleWallet,
+  saveNewActionsOnWallet,
+  removeActionsOnWallet,
+  getWalletIdByName,
+  addBallanceToWallet,
+  updateWallet,
+  suggestQuantityToBuy,
+  rebalanceWallet
+};

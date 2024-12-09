@@ -37,8 +37,79 @@ export class AuthService {
   }
 
   // Novo método para buscar as carteiras
-  getCarteiras(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/carteiras`);
+  getCarteiras(email: string): Observable<{ result: any[] }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/listar-carteiras`, {
+      params: { email }, // Passa o email como query string
+    });
   }
+
+  // Novo método para buscar as iformações de uma carteira específica
+  getCarteira(email: string, carteiraId: string): Observable<{ result: any }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-carteira`, {
+      params: { email, carteiraId },
+    });
+  }
+
+  // Novo método para Adicionar as carteiras
+  criarCarteira(email: string, nomeCarteira: string, acoes: Array<object>): Observable<{ success: boolean; error?: string }> {
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/criar-carteira`, {
+      email,
+      nomeCarteira,
+      acoes
+    });
+  }
+
+  adicionarSaldoCarteira(email: string, carteiraId: string, saldo: number): Observable<{ success: boolean; error?: string, novoSaldo?: number,  valorNaoInvestido?: number}> {
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/adicionar-saldo-carteira`, {
+      email,
+      carteiraId,
+      saldo
+    });
+  }
+
+  calcularQuantidades(valorInicial: number, acoes: Array<object>){
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/validar-quantidade-acoes`, {
+      investimentoInicial: valorInicial,
+      acoes: acoes
+    });
+  }
+
+  rebalancoCarteira(valorNaoInvestido: number, acoes: Array<object>): Observable<{ success: boolean; error?: string, result: Array<object>, saldoInsuficiente?: boolean }>{
+    return this.http.post<{ success: boolean; error?: string; result: Array<object>}>(`${this.apiUrl}/rebalancear-carteira-acoes`, {
+      valorNaoInvestido,
+      acoes
+    });
+  }
+
+  consultarCotacoes(acoes: Array<object>){
+    return this.http.post<{ success: boolean; error?: string, result: Array<any>}>(`${this.apiUrl}/consultar-cotacoes`, {
+      acoes: acoes
+    });
+  }
+
+  consultarIdsAcoes(): Observable<{ result: Array<string> }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-all-actions-names`, {});
+  }
+
+  consultarTodasAcoes(): Observable<{ result: Array<string> }> {
+    return this.http.get<{ result: any[] }>(`${this.apiUrl}/get-all-actions`, {});
+  }
+
+  salvarCarteira(email: string, carteiraInfo : any): Observable<{ success: boolean; error?: string, result?: any }>{
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/salvar-carteira`, {
+      email,
+      carteiraInfo
+    });
+  }
+
+  removerAcoesCarteira(email: string, carteiraId : string, acaoID: string, quantidadeAcao: number): Observable<{ success: boolean; error?: string, result?: any }>{
+    return this.http.post<{ success: boolean; error?: string }>(`${this.apiUrl}/remover-acao-carteira`, {
+      email,
+      carteiraId,
+      acaoID,
+      quantidadeAcao
+    });
+  }
+
 }
 

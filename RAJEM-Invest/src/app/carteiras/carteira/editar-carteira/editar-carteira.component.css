@@ -1,0 +1,234 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+  }
+  
+  header {
+    background-color: #184c43;
+    color: white;
+    position: fixed;
+    top: 0px;
+    width: 1360px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .invest {
+    color: #f1f1f1;
+  }
+  
+  nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 20px;
+    font-weight: bold;
+  }
+  
+  .profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .avatar {
+    background-color: #ff007f;
+    color: white;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    margin-right: 10px;
+  }
+  
+  .username {
+    font-size: 14px;
+  }
+  .scroll{ 
+    overflow: auto;
+    max-height: 80vh;
+  }
+  main {
+    display: flex;
+    justify-content: space-evenly;
+    width: 1360px;
+    flex-direction: row;
+    height: 90vh;
+  }
+  
+  .carteiras {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 900px;
+  }
+
+  .secaoAporte {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 350px;
+  }
+
+  .voltar-carteira {
+    float:right;
+    margin: 20px 0px;
+    padding: 10px 20px;
+    background-color: rgb(235, 38, 38);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+
+  .button-carteira {
+    margin: 20px 20px 20px 0px;
+    padding: 10px 20px;
+    background-color: #2fafa1;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .create-carteira:hover {
+    background-color: #248f81;
+  }
+  
+  h1, h2, h3, h4 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .carteira-list ul {
+    list-style: none;
+    padding: 0;
+    border: 1px solid #d9d9d9;
+  }
+  
+  .carteira-list li {
+    padding: 10px;
+    font-size: 16px;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  
+  .carteira-list li:hover, .carteira-list .selected {
+    background-color: #2fafa1;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .carteira-list li:last-child {
+    border-bottom: none;
+  }
+
+  .tabela-carteira {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    text-align: left;
+}
+
+/* Cabeçalho da tabela */
+.tabela-carteira thead tr {
+    background-color: #f4f4f4;
+    border-bottom: 2px solid #ddd;
+}
+
+.tabela-carteira th {
+    padding: 10px;
+    color: #333;
+    font-weight: bold;
+}
+
+/* Linhas do corpo da tabela */
+.tabela-carteira tbody tr {
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s ease;
+}
+
+.tabela-carteira tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Células da tabela */
+.tabela-carteira td input{
+    padding: 10px;
+    color: #555;
+}
+
+.inputsPadrao2{
+  padding: 8px;
+  border: solid 1px #c0c0c0;
+  width: 200px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* Estilos de variação (positivo/negativo) */
+.tabela-carteira .positivo {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.tabela-carteira .negativo {
+    color: #F44336;
+    font-weight: bold;
+}
+
+.inputsPadrao{
+  padding: 15px;
+  border: solid 1px #c0c0c0;
+  width: 200px;
+  border-radius: 5px;
+}
+
+th{
+  width: 100px;
+}
+
+td input{
+  width: 80px;
+}
+
+.tabela-acoes th{
+  color: #2fafa1;
+  text-align: center;
+  margin-bottom: 20px;
+  border-left: 1px solid;
+}
+
+.remover{
+  background-color: rgb(235, 38, 38);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;  
+}.remover{
+  background-color: rgb(235, 38, 38);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;  
+}

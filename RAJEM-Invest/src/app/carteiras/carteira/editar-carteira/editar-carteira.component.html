@@ -49,14 +49,14 @@
                     </thead>
                     <tbody>
                         <tr *ngFor="let linha of linhas; let i = index">
-                            <td><input type="text" [(ngModel)]="linha.acaoID"></td>
-                            <td><input type="text" [(ngModel)]="linha.setorAcao" disabled></td>
-                            <td><input type="number" [(ngModel)]="linha.quantidade"></td>
-                            <td><input type="number" [(ngModel)]="linha.cotacaoAtual" disabled></td>
-                            <td><input type="number" [(ngModel)]="linha.patrimonioAtualizado" disabled></td>
-                            <td><input type="number" [(ngModel)]="linha.participacaoAtual" disabled></td>
-                            <td><input type="number" [(ngModel)]="linha.objetivo"></td>
-                            <td><input type="number" [value]="linha.distanciaDoObjetivo" disabled></td>
+                            <td><input type="text" [(ngModel)]="linha.acaoID" class="inputsPadrao2"></td>
+                            <td><input type="text" [(ngModel)]="linha.setorAcao" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.quantidade" class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.cotacaoAtual" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.patrimonioAtualizado" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.participacaoAtual" disabled class="inputsPadrao2"></td>
+                            <td><input type="number" [(ngModel)]="linha.objetivo" class="inputsPadrao2"></td>
+                            <td><input type="number" [value]="linha.distanciaDoObjetivo" disabled class="inputsPadrao2"></td>
                             <td><button class="remover" (click)="removerLinha(i)">Remover</button></td>
                         </tr>
                     </tbody>

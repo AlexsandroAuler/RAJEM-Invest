@@ -39,9 +39,9 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let linha of linhas; let i = index">
-                        <td><input type="text" [(ngModel)]="linha.acaoID"></td>
-                        <td><input type="number" [(ngModel)]="linha.percentual"></td>
-                        <td><input type="number" [value]="linha.cotacaoAtual" disabled></td>
+                        <td><input type="text" [(ngModel)]="linha.acaoID" class="inputsPadrao2"></td>
+                        <td><input type="number" [(ngModel)]="linha.percentual" class="inputsPadrao2"></td>
+                        <td><input type="number" [value]="linha.cotacaoAtual"  class="inputsPadrao2" disabled></td>
                         <td>
                             <button class="remover" (click)="removerLinha(i)">Remover</button>
                         </td>

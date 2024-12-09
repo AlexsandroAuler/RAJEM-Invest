@@ -17,6 +17,7 @@ export class CriarCarteiraComponent {
   username : string = '';
   password: string = '';
   podeCriarCarteira: boolean = false;
+  totalPercentual: number = 0;
 
   linhas: { acaoID: string; setorAcao: string; percentual: number; cotacaoAtual: number; quantidade: number }[] = [];
 
@@ -31,23 +32,35 @@ export class CriarCarteiraComponent {
 
   //#region Criar Carteira
   async criarCarteira(): Promise<void> {
+
+
     try {
-      if(!this.podeCriarCarteira)
-        return alert("Você deve calcular as quantidades antes de poder criar a sua carteira.");
 
       const email = sessionStorage.getItem('email') as string;
       const nomeCarteira = (document.getElementById("nomeCarteira") as HTMLInputElement).value;
 
+      if(nomeCarteira == ""){
+        return alert("Você deve dar um nome a Carteira");
+      }
+
       let acoes = new Array<any>();
+
       //montar tabela de ações
       this.linhas.forEach(linha => {
         if (linha.percentual > 0) {
           const acao = {"acaoID": linha.acaoID, "setorAcao": linha.setorAcao, "quantidade": linha.quantidade, "cotacaoMomentoCompra": Number(linha.cotacaoAtual), "percentualOriginal": linha.percentual};
           acoes.push(acao);
+          this.totalPercentual += linha.percentual;
+
+          if (this.totalPercentual == 100) {
+            this.podeCriarCarteira = true;
+          }
+        }else{
+        return alert("Você deve inserir um percentual em todas as ações listada");
         }
       });
       
-      if (email && nomeCarteira && acoes) {
+      if (email && nomeCarteira && acoes && acoes.length > 0) {
         // Faz a requisição para adicionar uma nova carteira
         const response = await firstValueFrom(this.authService.criarCarteira(email, nomeCarteira, acoes));
         
@@ -90,18 +103,13 @@ export class CriarCarteiraComponent {
   }
   
   async consultarCotacoes(): Promise<void> {
-    this.podeCriarCarteira = false;
-
-    if(!this.calcularSomatoriaPercentuais())
-      alert('A somatória dos percentuais deve ser igual a 100%');
-    else{
       let acoes = new Array<any>();
 
       this.linhas.forEach(linha => {
-        if (linha.percentual > 0) {
-          const acao = {"acaoID": linha.acaoID, "setorAcao": linha.setorAcao, "percentual": linha.percentual};
-          acoes.push(acao);
-        }
+        
+      const acao = {"acaoID": linha.acaoID, "setorAcao": linha.setorAcao, "percentual": linha.percentual};
+      acoes.push(acao);
+       
       });
 
       if(await this.validarIdsAcoesTabela(acoes)){
@@ -109,17 +117,15 @@ export class CriarCarteiraComponent {
       }
       const response = await firstValueFrom(this.authService.consultarCotacoes(acoes));
       this.ajustarCotacaoTabela(response);
-    }
   }
+ 
   
   ajustarCotacaoTabela(result: any): void{
     this.linhas.forEach(linha => {
       var acaoRetorno = result.result.find((x: any) => x.acaoID === linha.acaoID);
       linha.setorAcao = acaoRetorno.setorAcao;
       linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
-    });
-
-    this.podeCriarCarteira = true;
+    });  
   }
   //#endregion
 

@@ -390,13 +390,13 @@ async function rebalanceWallet(valorNaoInvestido, acoes){
 }
 
 function actualActionPrice(acao){
-  // Deveria ser esse o cálculo, pq não faz sentido o valor de fechamento ser o atual (mas é)
-  // const valorFechamentoAcao = parseFloat(acao.close.toFixed(2));
-  // const VariacaoAcao = 1 + (acao.change / 100);
-  // const valorAcao = parseFloat(valorFechamentoAcao + VariacaoAcao).toFixed(2);
+  //Deveria ser esse o cálculo, pq não faz sentido o valor de fechamento ser o atual (mas é)
+  const valorFechamentoAcao = parseFloat(acao.close.toFixed(2));
+  const VariacaoAcao = 1 + (acao.change / 100);
+  const valorAcao = parseFloat(valorFechamentoAcao + VariacaoAcao).toFixed(2);
 
-  const valorAcao = parseFloat(acao.close.toFixed(2));
-  return valorAcao;
+  //const valorAcao = parseFloat(acao.close.toFixed(2));
+  return valorFechamentoAcao;
 }
 
 async function existActionOnWallet(userID, carteiraID, acaoID) {

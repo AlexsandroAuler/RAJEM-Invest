@@ -65,9 +65,10 @@ body {
   }
   main {
     display: flex;
-    justify-content: center;
-    margin-top: 50px;
+    justify-content: space-evenly;
     width: 1360px;
+    flex-direction: row;
+    height: 90vh;
   }
   
   .carteiras {
@@ -175,6 +176,14 @@ body {
 .tabela-carteira td input{
     padding: 10px;
     color: #555;
+}
+
+.inputsPadrao2{
+  padding: 8px;
+  border: solid 1px #c0c0c0;
+  width: 200px;
+  border-radius: 5px;
+  margin-top: 10px;
 }
 
 /* Estilos de variação (positivo/negativo) */

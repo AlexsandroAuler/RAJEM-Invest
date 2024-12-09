@@ -123,7 +123,7 @@ export class EditarCarteiraComponent {
     const quantidadeAtual = linhaSelecionada.quantidade;
     const quantidadeRemover = parseInt(prompt("Quantas ações você deseja remover?") || "0", 10);
 
-    if (carteiraId != null && !isNaN(quantidadeRemover) && quantidadeRemover > 0) {
+    if (carteiraId != null && !isNaN(quantidadeRemover) && quantidadeRemover >= 0 ) {
         if (quantidadeRemover > quantidadeAtual) {
             alert("A quantidade informada excede o número de ações na carteira.");
         } else {

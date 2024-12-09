@@ -61,10 +61,13 @@ nav a {
 }
 
 main {
-  display: flex;
-  justify-content: center;
-  margin-top: 50px;
+  display: flex  ;
+  justify-content: space-between;
   width: 1360px;
+  flex-direction: row;
+  height: 90vh;
+  position: relative;
+  top: 50px;
 }
 
 .carteiras {
@@ -72,7 +75,7 @@ main {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 600px;
+  width: 300px;
 }
 
 h1 {
@@ -121,11 +124,31 @@ h1 {
   border-radius: 5px;
 }
 
+.inputsPadrao2{
+  padding: 8px;
+  border: solid 1px #c0c0c0;
+  width: 200px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+.tabela-acoes{
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 900px;
+}
+
 .tabela-acoes th{
   color: #2fafa1;
   text-align: center;
   margin-bottom: 20px;
   border-left: 1px solid;
+}
+
+.tabela-acoes td input{
+ 
 }
 
 .buttonTabela{

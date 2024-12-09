@@ -247,22 +247,35 @@ async function updateWallet(userId, carteiraInfo) {
   const collection = await dataBaseCollectionConnection('carteiraAcoes');
 
   for (const acao of carteiraInfo.acoesCarteira){
-  
-    const queryCarteiraAcao = {
-      _id: new ObjectId(acao._id),
-      userID: acao.userID,
-      carteiraID: acao.carteiraID
-    };
-  
-    const update = {
-      $set: { 
+    if(acao.isNew){
+      const newAcao = {
+        userID: acao.userID,
+        carteiraID: acao.carteiraID,
+        acaoID: acao.acaoID,
+        setorAcao: acao.setorAcao,
         quantidadeAcao: acao.quantidadeAcao,
         cotacaoMomentoCompra: acao.cotacaoMomentoCompra,
         percentualDefinidoParaCarteira: acao.percentualDefinidoParaCarteira
-      }
-    };
-  
-    await collection.updateOne(queryCarteiraAcao, update);
+      };
+
+      const result = await collection.insertOne(newAcao);
+    }else{
+      const queryCarteiraAcao = {
+        _id: new ObjectId(acao._id),
+        userID: acao.userID,
+        carteiraID: acao.carteiraID
+      };
+    
+      const update = {
+        $set: { 
+          quantidadeAcao: acao.quantidadeAcao,
+          cotacaoMomentoCompra: acao.cotacaoMomentoCompra,
+          percentualDefinidoParaCarteira: acao.percentualDefinidoParaCarteira
+        }
+      };
+    
+      await collection.updateOne(queryCarteiraAcao, update);
+    }
   }
 
   //atualizar carteira
@@ -370,6 +383,7 @@ async function rebalanceWallet(valorNaoInvestido, acoes){
   
     let acaoRetorno = {
       acaoID: acao.acaoID,
+      setorAcao: detalhesAcao[0].sector,
       percentual: percentualAcao,
       quantidade: quantidadeDeAcoes,
       cotacaoAtual: valorAcao

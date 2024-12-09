@@ -23,7 +23,7 @@ export class EditarCarteiraComponent {
   
   linhas: { acaoID: string; setorAcao: string; objetivo: number;
     cotacaoAtual: number; quantidade: number, patrimonioAtualizado: number, 
-    participacaoAtual: number, distanciaDoObjetivo: number}[] = [];
+    participacaoAtual: number, distanciaDoObjetivo: number, isNew: boolean}[] = [];
 
   carteiraInfo: { carteira: any; acoesCarteira: Array<any> } = {
     carteira: null,
@@ -107,14 +107,14 @@ export class EditarCarteiraComponent {
   }
 
   adicionarLinha(): void {
-    this.linhas.push({ acaoID: '', setorAcao: '', objetivo: 0, cotacaoAtual: 0, quantidade: 0, patrimonioAtualizado: 0, participacaoAtual: 0, distanciaDoObjetivo: 0 });
+    this.linhas.push({ acaoID: '', setorAcao: '', objetivo: 0, cotacaoAtual: 0, quantidade: 0, patrimonioAtualizado: 0, participacaoAtual: 0, distanciaDoObjetivo: 0, isNew: true });
   }
 
   adicionarLinhaAcao(acaoID: string, setorAcao: string, 
     cotacaoAtual: number, quantidade: number, patrimonioAtualizado: number, 
     participacaoAtual: number, objetivo: number, distanciaDoObjetivo: number)
     : void{
-      this.linhas.push({ acaoID, setorAcao, quantidade, cotacaoAtual, patrimonioAtualizado, participacaoAtual, objetivo,distanciaDoObjetivo });
+      this.linhas.push({ acaoID, setorAcao, quantidade, cotacaoAtual, patrimonioAtualizado, participacaoAtual, objetivo,distanciaDoObjetivo, isNew: false });
   }
 
   async removerLinha(index: number): Promise<void> {
@@ -178,6 +178,10 @@ export class EditarCarteiraComponent {
   ajustarCotacaoTabela(result: any): void{
     this.linhas.forEach(linha => {
       var acaoRetorno = result.find((x: any) => x.acaoID === linha.acaoID);
+
+      if(linha.isNew)
+        linha.setorAcao = acaoRetorno.setorAcao;
+
       linha.cotacaoAtual = acaoRetorno.cotacaoAtual;
     });
   }
@@ -199,7 +203,7 @@ export class EditarCarteiraComponent {
     }
   }
 
-  async rebalancoCarteira(): Promise<void>{
+  async rebalancoCarteira(): Promise<void>{  
     if(await this.validar()){
       return this.alertar();
     }
@@ -208,7 +212,23 @@ export class EditarCarteiraComponent {
 
       this.linhas.forEach(linha => {
         var acao = this.carteiraInfo.acoesCarteira.find((x: any) => x.acaoID === linha.acaoID);
-        if(linha.distanciaDoObjetivo < 0){
+        if(!this.carteiraInfo.carteira.primeiraCompra && linha.isNew){
+          //fluxo específico onde uma nova ação é adicionada na carteira quando já ouveram compras
+          //nesse caso a distância do objetivo esta zerada, pois não houve defasagem ou lucro, porém essa ação precisa ser considerada ao rebalancear
+          //como não foi feita nenhuma compra para essa ação, a distância do objetivo é igual ao objetivo definido
+          linha.distanciaDoObjetivo = linha.objetivo * -1;
+
+          const newAcao = {
+            acaoID: linha.acaoID,
+            carteiraID: this.carteiraInfo.carteira.carteiraID,
+            distanciaDoObjetivo: linha.objetivo * -1,
+            percentualDefinidoParaCarteira: linha.objetivo,
+            quantidadeAcao: 0,
+            userID: this.carteiraInfo.carteira.usuarioID
+          }
+          acoesParaRebalancear.push(newAcao);
+        }
+        else if(linha.distanciaDoObjetivo < 0){
           acao.distanciaDoObjetivo = linha.distanciaDoObjetivo;
           acoesParaRebalancear.push(acao);
         }
@@ -260,6 +280,10 @@ export class EditarCarteiraComponent {
   rebalancoTabela(result: any): void{
     this.linhas.forEach(linha => {
       var acaoRetorno = result.result.find((x: any) => x.acaoID === linha.acaoID);
+
+      if(linha.isNew)
+        linha.setorAcao = acaoRetorno.setorAcao;
+
       linha.quantidade += acaoRetorno?.quantidade ?? 0;
     });  
   }
@@ -288,10 +312,26 @@ export class EditarCarteiraComponent {
 
   ajustarValoresCarteira(): void{
     this.linhas.forEach(linha => {
-      var acao = this.carteiraInfo.acoesCarteira.find((x: any) => x.acaoID === linha.acaoID);
-      acao.quantidadeAcao = linha.quantidade;
-      acao.cotacaoMomentoCompra = Number(linha.cotacaoAtual);
-      acao.percentualDefinidoParaCarteira = linha.objetivo;
+      if(linha.isNew){
+        const newAcao = {
+          isNew: linha.isNew,
+          acaoID: linha.acaoID,
+          carteiraID: this.carteiraInfo.carteira._id,
+          cotacaoMomentoCompra: linha.cotacaoAtual,
+          percentualDefinidoParaCarteira: linha.objetivo,
+          quantidadeAcao: linha.quantidade,
+          setorAcao: linha.setorAcao,
+          userID: this.carteiraInfo.carteira.usuarioID
+        }
+
+        this.carteiraInfo.acoesCarteira.push(newAcao);
+      }
+      else if(linha.objetivo > 0){
+        var acao = this.carteiraInfo.acoesCarteira.find((x: any) => x.acaoID === linha.acaoID);
+        acao.quantidadeAcao = linha.quantidade;
+        acao.cotacaoMomentoCompra = Number(linha.cotacaoAtual);
+        acao.percentualDefinidoParaCarteira = linha.objetivo;
+      }
     });
   }
 

@@ -74,9 +74,10 @@ export class AuthService {
     });
   }
 
-  rebalancoCarteira(valorNaoInvestido: number, acoes: Array<object>): Observable<{ success: boolean; error?: string, result: Array<object>, saldoInsuficiente?: boolean }>{
+  rebalancoCarteira(valorNaoInvestido: number, valorTotalCarteiraCotacaoAtual: number, acoes: Array<object>): Observable<{ success: boolean; error?: string, result: Array<object>, saldoInsuficiente?: boolean }>{
     return this.http.post<{ success: boolean; error?: string; result: Array<object>}>(`${this.apiUrl}/rebalancear-carteira-acoes`, {
       valorNaoInvestido,
+      valorTotalCarteiraCotacaoAtual,
       acoes
     });
   }

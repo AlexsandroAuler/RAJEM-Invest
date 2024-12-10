@@ -20,6 +20,7 @@ export class EditarCarteiraComponent {
   mensagemErro = '';
   cotacoesAtualizadas = new Array<any>;
   valorTotalCarteiraCotacaoAtual: number = 0;
+  bloquearRebalanco: boolean = false;
   
   linhas: { acaoID: string; setorAcao: string; objetivo: number;
     cotacaoAtual: number; quantidade: number, patrimonioAtualizado: number, 
@@ -203,7 +204,7 @@ export class EditarCarteiraComponent {
     }
   }
 
-  async rebalancoCarteira(): Promise<void>{  
+  async rebalancoCarteira(): Promise<void>{
     if(await this.validar()){
       return this.alertar();
     }
@@ -224,21 +225,26 @@ export class EditarCarteiraComponent {
             distanciaDoObjetivo: linha.objetivo * -1,
             percentualDefinidoParaCarteira: linha.objetivo,
             quantidadeAcao: 0,
-            userID: this.carteiraInfo.carteira.usuarioID
+            userID: this.carteiraInfo.carteira.usuarioID,
+            cotacoaAtual: linha.cotacaoAtual,
+            patrimonioAtualizado: linha.patrimonioAtualizado
           }
           acoesParaRebalancear.push(newAcao);
         }
         else if(linha.distanciaDoObjetivo < 0){
           acao.distanciaDoObjetivo = linha.distanciaDoObjetivo;
+          acao.cotacoaAtual = linha.cotacaoAtual;
+          acao.patrimonioAtualizado = linha.patrimonioAtualizado;
           acoesParaRebalancear.push(acao);
         }
       });
       
-      const result = await firstValueFrom(this.authService.rebalancoCarteira(this.carteiraInfo.carteira.valorNaoInvestido, acoesParaRebalancear));
+      const result = await firstValueFrom(this.authService.rebalancoCarteira(this.carteiraInfo.carteira.valorNaoInvestido, this.valorTotalCarteiraCotacaoAtual, acoesParaRebalancear));
       
       if(result.saldoInsuficiente){
         alert('Saldo insuficiente para a compra das ações.')
       }else{
+        this.bloquearRebalanco = true;
         this.rebalancoTabela(result);
         this.carteiraInfo.carteira.valorInvestimento += this.carteiraInfo.carteira.valorNaoInvestido;
         this.carteiraInfo.carteira.valorNaoInvestido = 0;

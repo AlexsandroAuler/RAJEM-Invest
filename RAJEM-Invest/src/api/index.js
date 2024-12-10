@@ -369,7 +369,7 @@ async function suggestQuantityToBuy(investimentoInicial, acoes){
   return retorno;
 }
 
-async function rebalanceWallet(valorNaoInvestido, acoes){
+async function rebalanceWallet(valorNaoInvestido, valorTotalCarteiraCotacaoAtual, acoes){
   let retorno = [];
   const somatoriaPercentuaisDefasados = acoes.reduce((accumulator, acao) => accumulator + acao.distanciaDoObjetivo, 0);
 
@@ -380,7 +380,7 @@ async function rebalanceWallet(valorNaoInvestido, acoes){
     const detalhesAcao = await getSpecificAction(acao.acaoID);
 
     const valorAcao = actualActionPrice(detalhesAcao[0]);
-    const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+    let quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
 
     //limita pra ficar o mais proximo possivel do objetivo
     if(quantidadeDeAcoes > quantidadeMaxCompraAcao)

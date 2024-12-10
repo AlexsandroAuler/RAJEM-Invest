@@ -256,8 +256,8 @@ app.post('/validar-quantidade-acoes', async(req, res) => {
 });
 
 app.post('/rebalancear-carteira-acoes', async(req, res) => {
-  const { valorNaoInvestido, acoes } = req.body;
-  const retorno = await rebalanceWallet(valorNaoInvestido, acoes);
+  const { valorNaoInvestido, valorTotalCarteiraCotacaoAtual, acoes } = req.body;
+  const retorno = await rebalanceWallet(valorNaoInvestido, valorTotalCarteiraCotacaoAtual, acoes);
   if(!retorno){
     res.status(200).json({ saldoInsuficiente: true });
   }else{

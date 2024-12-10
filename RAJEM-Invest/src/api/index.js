@@ -381,6 +381,10 @@ async function rebalanceWallet(valorNaoInvestido, acoes){
 
     const valorAcao = actualActionPrice(detalhesAcao[0]);
     const quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
+
+    //limita pra ficar o mais proximo possivel do objetivo
+    if(quantidadeDeAcoes > quantidadeMaxCompraAcao)
+      quantidadeDeAcoes = quantidadeMaxCompraAcao;
   
     let acaoRetorno = {
       acaoID: acao.acaoID,

@@ -272,8 +272,6 @@ app.post('/consultar-cotacoes', async(req, res) => {
   for (const acao of acoes) {
     const detalhesAcao = await getSpecificAction(acao.acaoID);
     const valorFechamentoAcao = parseFloat(detalhesAcao[0].close.toFixed(2));
-    const valorVariacaoAcao = parseFloat(detalhesAcao[0].change.toFixed(2));
-    //const valorAcao = parseFloat((valorFechamentoAcao + valorVariacaoAcao).toFixed(2));
 
     let acaoRetorno = {
       acaoID: acao.acaoID,

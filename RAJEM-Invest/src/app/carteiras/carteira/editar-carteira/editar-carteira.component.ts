@@ -130,7 +130,7 @@ export class EditarCarteiraComponent {
             const response = await firstValueFrom(this.authService.removerAcoesCarteira(this.username, carteiraId, linhaSelecionada.acaoID, quantidadeRemover));
 
             if(quantidadeAtual == quantidadeRemover)
-              this.linhas.splice(index, quantidadeRemover);
+              this.linhas.splice(index, 1);
             else
               this.linhas[index].quantidade -= quantidadeRemover;
 

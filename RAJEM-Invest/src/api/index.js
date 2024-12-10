@@ -342,8 +342,11 @@ async function addBallanceToWallet(userId, carteiraID, saldo) {
 async function validateQuantityActionsOnWallet(userID, carteiraID, acaoID, quantidadeAcao) {
   const wallet = await existActionOnWallet(userID, carteiraID, acaoID);
 
-  if(wallet == null)
-    throw new Error('Combinação de ação e carteira não encontrada.');
+  if(wallet == null){
+    console.log('Combinação de ação e carteira não encontrada.');
+    return 0;
+  }
+    
 
   return wallet.quantidadeAcao;
 }

@@ -375,7 +375,7 @@ async function rebalanceWallet(valorNaoInvestido, valorTotalCarteiraCotacaoAtual
 
   for (const acao of acoes){
     //const quantidadeMaxCompraAcao = calculateMaxPurchaseQuantity(acao, valorTotalCarteiraCotacaoAtual);
-    console.log(quantidadeMaxCompraAcao)
+    //console.log(quantidadeMaxCompraAcao)
     const percentualAcao = parseFloat(((acao.distanciaDoObjetivo * 100) / somatoriaPercentuaisDefasados).toFixed(2));
     const valorTotalAcao = parseFloat(((percentualAcao * valorNaoInvestido) / 100).toFixed(2));
     const detalhesAcao = await getSpecificAction(acao.acaoID);
@@ -384,8 +384,8 @@ async function rebalanceWallet(valorNaoInvestido, valorTotalCarteiraCotacaoAtual
     let quantidadeDeAcoes = Math.floor(valorTotalAcao / valorAcao);
 
     //limita pra ficar o mais proximo possivel do objetivo
-    if(quantidadeDeAcoes > quantidadeMaxCompraAcao)
-      quantidadeDeAcoes = quantidadeMaxCompraAcao;
+    //if(quantidadeDeAcoes > quantidadeMaxCompraAcao)
+      //quantidadeDeAcoes = quantidadeMaxCompraAcao;
   
     let acaoRetorno = {
       acaoID: acao.acaoID,

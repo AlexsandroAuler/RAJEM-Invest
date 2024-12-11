@@ -64,7 +64,7 @@
             </div>
             <button class="button-carteira" (click)="adicionarLinha()">Adicionar Nova Ação</button>
             <button class="button-carteira" (click)="calcularTabela()">Consultar Cotações</button>
-            <button class="button-carteira" (click)="sugerirCompra()" *ngIf="primeiraCompra">Sugerir Compra</button>
+            <button class="button-carteira" (click)="sugerirCompra()" *ngIf="primeiraCompra && !bloquearSugestaoCompra">Sugerir Compra</button>
             <button id="botaoRebalanco" class="button-carteira" (click)="rebalancoCarteira()" *ngIf="!primeiraCompra && !bloquearRebalanco" title="Ao rebalancear, o valor não investido será utilizado como base para cancular
             o rebalanceamento da carteira.">Rebalancear</button>
             <button class="button-carteira" (click)="salvarCarteira()">Salvar Carteira</button>

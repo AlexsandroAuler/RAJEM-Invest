@@ -374,7 +374,8 @@ async function rebalanceWallet(valorNaoInvestido, valorTotalCarteiraCotacaoAtual
   const somatoriaPercentuaisDefasados = acoes.reduce((accumulator, acao) => accumulator + acao.distanciaDoObjetivo, 0);
 
   for (const acao of acoes){
-    const quantidadeMaxCompraAcao = calculateMaxPurchaseQuantity(acao);
+    //const quantidadeMaxCompraAcao = calculateMaxPurchaseQuantity(acao, valorTotalCarteiraCotacaoAtual);
+    console.log(quantidadeMaxCompraAcao)
     const percentualAcao = parseFloat(((acao.distanciaDoObjetivo * 100) / somatoriaPercentuaisDefasados).toFixed(2));
     const valorTotalAcao = parseFloat(((percentualAcao * valorNaoInvestido) / 100).toFixed(2));
     const detalhesAcao = await getSpecificAction(acao.acaoID);
@@ -418,11 +419,27 @@ function actualActionPrice(acao){
   return valorFechamentoAcao;
 }
 
-function calculateMaxPurchaseQuantity(acao){
-  const percentualDefasado = (acao.distanciaDoObjetivo / 100) * -1;
-  const quantidadeMaximaDeCompra = Math.floor(acao.quantidadeAcao * percentualDefasado);
+function calculateMaxPurchaseQuantity(acao, valorTotalCarteiraCotacaoAtual) {
+  // Valor inicial da carteira
+  const valorAtualAcao = acao.quantidadeAcao * acao.cotacoaAtual;
+  const valorAtualTotal = valorTotalCarteiraCotacaoAtual;
 
-  return quantidadeMaximaDeCompra;
+  // Ajuste dinâmico considerando a compra adicional de ações
+  let quantidadeAdicional = 0;
+  let novoValorAcao, novoValorTotal, percentualAtual;
+
+  do {
+    // Simula a compra de mais uma ação
+    quantidadeAdicional++;
+    novoValorAcao = valorAtualAcao + (quantidadeAdicional * acao.cotacoaAtual);
+    novoValorTotal = valorAtualTotal + (quantidadeAdicional * acao.cotacoaAtual);
+
+    // Calcula o percentual atualizado
+    percentualAtual = (novoValorAcao / novoValorTotal) * 100;
+  } while (percentualAtual < acao.percentualDefinidoParaCarteira);
+
+  // Retorna a quantidade total necessária para atingir o balanço
+  return quantidadeAdicional;
 }
 
 async function existActionOnWallet(userID, carteiraID, acaoID) {

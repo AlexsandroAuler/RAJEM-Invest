@@ -21,6 +21,7 @@ export class EditarCarteiraComponent {
   cotacoesAtualizadas = new Array<any>;
   valorTotalCarteiraCotacaoAtual: number = 0;
   bloquearRebalanco: boolean = false;
+  bloquearSugestaoCompra: boolean = false;
   
   linhas: { acaoID: string; setorAcao: string; objetivo: number;
     cotacaoAtual: number; quantidade: number, patrimonioAtualizado: number, 
@@ -195,12 +196,18 @@ export class EditarCarteiraComponent {
     if(await this.validar()){
       return this.alertar();
     }
+    else if(this.carteiraInfo.carteira.valorNaoInvestido <= 0){
+      alert('Saldo insuficiente!');
+    }
     else{
       const result = await firstValueFrom(this.authService.calcularQuantidades(this.carteiraInfo.carteira.valorNaoInvestido, this.carteiraInfo.acoesCarteira));
-      if(!result)
+      if(!result){
         alert('Ocorreu um erro inesperado, por favor tente novamente.');
-      else
+      }  
+      else{
+        this.bloquearSugestaoCompra = true;
         this.aplicarSugestaoTabela(result);
+      }       
     }
   }
 
